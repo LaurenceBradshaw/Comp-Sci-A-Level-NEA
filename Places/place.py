@@ -106,13 +106,14 @@ class City(container.Container):
 
     def populate(self, db):
         # Makes all the environments the city contains
-
+        print("Making host objects for {}...".format(self.name))
         # Makes host classes for the city
         hostCount = db.getHostCount(self.name)[0]
         for x in range(hostCount):
             self.hosts.append(person.Person())
 
         print("Made host objects for {}".format(self.name))
+        print("Sorting host objects for {}...".format(self.name))
 
         hostsInEducation = []
         hostsInEmployment = []
@@ -126,7 +127,8 @@ class City(container.Container):
             else:
                 hostsInEmployment.append(h)
 
-        print("Sorted hosts objects for {}".format(self.name))
+        print("Sorted host objects for {}".format(self.name))
+        print("Making environments and adding hosts for {}...".format(self.name))
 
         environmentInfo = db.getEnvironments(self.name)
 
@@ -188,14 +190,22 @@ class City(container.Container):
 
         return count
 
+    def getCommuters(self, percentage):
+        toReturn = []
+        numToReturn = round(len(self.commutePopulation)*percentage)
+        for x in range(numToReturn):
+            toReturn.append(self.commutePopulation.pop(0))
+        return toReturn
+
     def timeStep(self, disease, day):
         hostObjects = self.hosts.copy()
         for o in self.objects:
             if o.name == "Shop":
                 numToTake = numberHandler.weightedRandom(self.shopRange[0], self.shopRange[1], self.shopRange[2])
                 o.hosts = []
+                random.shuffle(o.hosts)
                 for _ in range(numToTake):
-                    o.hosts += hostObjects.pop(random.randint(0, len(hostObjects)-1))
+                    o.hosts.append(hostObjects.pop(0))
             o.timeStep(disease, day)
         self.commutePopulation = random.sample(self.hosts, round(len(self.hosts)*(self.commutePercentage/100)))
 
@@ -220,6 +230,7 @@ class Country(container.Container):
             city.populate(db)
 
         print("Finished All Cities")
+        print("Making City Matrix...")
 
         # Matrix that stores the distances between the cities
         matrix = [[0.0 for x in range(len(cityDetails))] for y in range(len(cityDetails))]
@@ -245,6 +256,7 @@ class Country(container.Container):
         # TODO make list of used combination indexes?
         self.halfwayHouses = [[Building("Everyday", "HalfwayHouse", 0.8, []) for x in range(len(cityDetails))] for y in range(len(cityDetails))]
         usedIndexes = []
+        # TODO Make cities return the people to add to the halfway house
 
         # Pog 07/01/2022
         # totalDistance = 0  # sum of all the inverse distances between cities
@@ -263,6 +275,16 @@ class Country(container.Container):
     def timeStep(self, disease, day):
         for o in self.objects:
             o.timeStep(disease, day)
+
+        for cityFrom, row in enumerate(self.halfwayHouses):
+            for cityTo, halfwayHouse in enumerate(row):
+                if len(self.halfwayHouses[cityTo][cityFrom].hosts) == 0:
+                    halfwayHouse.hosts += self.objects[cityFrom].getCommuters(self.percentageMatrix[cityFrom][cityTo])
+
+        for row in self.halfwayHouses:
+            for h in row:
+                h.timeStep(disease, day)
+                h.hosts = []
 
     def getImmuneCount(self):
         count = 0

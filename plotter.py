@@ -15,29 +15,45 @@ class Plotter(plotter.Plotter):
 
     def makePlot(self):
         # outputs the final plot for each city
-        cityNum = 0
-        for c in self.cities:
+        for num, city in enumerate(self.cities):
             ax = plt.gca()
 
-            self.output[cityNum].plot(kind='line', x='Day', y='Infected', ax=ax, color='red')
-            self.output[cityNum].plot(kind='line', x='Day', y='Immunities', ax=ax, color='k')
+            self.output[num].plot(kind='line', x='Day', y='Infected', ax=ax, color='red')
+            self.output[num].plot(kind='line', x='Day', y='Immunities', ax=ax, color='k')
             plt.xticks(rotation=20)
 
-            filename = 'C:/Users/lozin/Documents/Projects/{}Output.png'.format(c[0])
+            filename = 'C:/Users/lozin/Documents/Projects/{}Output.png'.format(city[0])
             plt.savefig(filename)
             plt.close()
-            cityNum += 1
-            print("Plot made for {}".format(c[0]))
+            print("Plot made for {}".format(city[0]))
 
-    def updateOutput(self, i, cities):
+        # cityNum = 0
+        # for c in self.cities:
+        #     ax = plt.gca()
+        #
+        #     self.output[cityNum].plot(kind='line', x='Day', y='Infected', ax=ax, color='red')
+        #     self.output[cityNum].plot(kind='line', x='Day', y='Immunities', ax=ax, color='k')
+        #     plt.xticks(rotation=20)
+        #
+        #     filename = 'C:/Users/lozin/Documents/Projects/{}Output.png'.format(c[0])
+        #     plt.savefig(filename)
+        #     plt.close()
+        #     cityNum += 1
+        #     print("Plot made for {}".format(c[0]))
+
+    def updateOutput(self, i, topLevel):
         # gets the number of people infected and immune people on day 'i' to plot on graph
 
-        cityNum = 0
-        for city in cities.objects:
-            numInfected = 0
-            numImmune = 0
-            numInfected += city.getInfectedCount()
-            numImmune += city.getImmuneCount()
-            self.output[cityNum] = self.output[cityNum].append({'Day': i, 'Infected': numInfected, 'Immunities': numImmune},
-                                                               ignore_index=True)
-            cityNum += 1
+        for num, city in enumerate(topLevel.objects):
+            self.output[num] = self.output[num].append({'Day': i, 'Infected': city.getInfectedCount(), 'Immunities': city.getImmuneCount()},
+                                    ignore_index=True)
+
+        # cityNum = 0
+        # for city in topLevel.objects:
+        #     numInfected = 0
+        #     numImmune = 0
+        #     numInfected += city.getInfectedCount()
+        #     numImmune += city.getImmuneCount()
+        #     self.output[cityNum] = self.output[cityNum].append({'Day': i, 'Infected': numInfected, 'Immunities': numImmune},
+        #                                                        ignore_index=True)
+        #     cityNum += 1

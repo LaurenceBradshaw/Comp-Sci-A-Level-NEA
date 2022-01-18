@@ -3,13 +3,8 @@ import model
 import databaseHandler
 
 if __name__ == '__main__':
-    numPeople = 130000
-    numWorkplaces = 2100
-    numHouses = 51499
-    numSchools = 42
-    numShops = 40
 
-    runtime = 200
+    runtime = 100
     dbHandler = databaseHandler.DatabaseHandler(1)
 
     startDateDay = 1

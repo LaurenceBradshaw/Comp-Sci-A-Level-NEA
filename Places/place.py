@@ -79,19 +79,6 @@ class Building(environment.Environment):
             h.decrement(disease)
 
 
-class BuildingNonStatic(Building):
-    # This is a building that will have a population that changes each time step
-    def __init__(self, activePeriod, name, infectionMultiplier, hostObjects):
-        super().__init__(activePeriod, name, infectionMultiplier, hostObjects)
-        self.allHosts = []
-
-    def populate(self, hostObjects):
-        self.allHosts = hostObjects
-
-    def timeStep(self, disease, day):
-        pass  # me a beer!
-
-
 class City(container.Container):
     # City will contain and interact between the buildings
 
@@ -276,10 +263,14 @@ class Country(container.Container):
         for o in self.objects:
             o.timeStep(disease, day)
 
-        for cityFrom, row in enumerate(self.halfwayHouses):
-            for cityTo, halfwayHouse in enumerate(row):
-                if len(self.halfwayHouses[cityTo][cityFrom].hosts) == 0:
-                    halfwayHouse.hosts += self.objects[cityFrom].getCommuters(self.percentageMatrix[cityFrom][cityTo])
+        for row in range(len(self.halfwayHouses[0])-1):
+            for col in range(row+1, len(self.halfwayHouses[0])):
+                self.halfwayHouses[row][col].hosts += self.objects[row].getCommuters(self.percentageMatrix[row][col])
+
+        # for cityFrom, row in enumerate(self.halfwayHouses):
+        #     for cityTo, halfwayHouse in enumerate(row):
+        #         if len(self.halfwayHouses[cityTo][cityFrom].hosts) == 0:
+        #             halfwayHouse.hosts += self.objects[cityFrom].getCommuters(self.percentageMatrix[cityFrom][cityTo])
 
         for row in self.halfwayHouses:
             for h in row:

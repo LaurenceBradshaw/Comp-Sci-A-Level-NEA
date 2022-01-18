@@ -62,7 +62,6 @@ class Preprocessing(preprocessor.Preprocessing):
         # for c in cities:
         #     c.matrix = matrix[counter]
         #     counter += 1
-
         self.initialInfection(disease, topLevel)
 
         return topLevel
@@ -72,6 +71,8 @@ class Preprocessing(preprocessor.Preprocessing):
         c = topLevel.objects[cityNum]
         buildingNum = random.randint(0, len(c.objects)-1)
         building = c.objects[buildingNum]
+        if len(building.hosts) == 0:
+            building = c.objects[random.randint(0, len(c.objects)-1)]
         hostNum = random.randint(0, len(building.hosts)-1)
         toInfect = building.hosts[hostNum]
         toInfect.infected = True

@@ -13,7 +13,6 @@ class Person(host.Host):
         return self.age
 
     def increment(self, disease):
-        self.decrement(disease)
         # increases time infected on people infected
         if self.infected and not self.immune:
             self.latencyTime += 1

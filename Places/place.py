@@ -8,7 +8,6 @@ import math
 
 class Building(environment.Environment):
     # Building class will contain hosts and handle their interactions
-    # TODO make two different kinds of building - One with moving population and one with fixed population
     def __init__(self, activePeriod, name, infectionMultiplier, hostObjects):
         super(Building, self).__init__(name, activePeriod, infectionMultiplier)
         self.populate(hostObjects)
@@ -49,10 +48,6 @@ class Building(environment.Environment):
                     for uip in random.sample(uninfectedHosts, interactions):
                         if random.randint(0, 100) < (disease.infectionChance * 100):
                             uip.infected = True
-
-        # TODO Move to city as it will be double counted here
-        self.increment(disease)
-        self.decrement(disease)
 
     def getInfectedHosts(self):
         # Returns the infected host objects
@@ -123,7 +118,7 @@ class City(container.Container):
         # for o in self.objects:
         #     hostObjects += o.hosts
 
-        for e in environmentInfo:  # TODO make shops
+        for e in environmentInfo:
             if e[0] == "House":
                 for x in range(e[1]):
                     hostCount = numberHandler.weightedRandom(e[2], e[3], e[4])
@@ -155,10 +150,9 @@ class City(container.Container):
                         hostsToGo += hostsInEducation
                     self.objects.append(Building(e[5], e[0], e[6], hostsToGo))
             elif e[0] == "Shop":
-                nullList = []
                 self.shopRange += e[2], e[3], e[4]
                 for x in range(e[1]):
-                    self.objects.append(Building(e[5], e[0], e[6], nullList))
+                    self.objects.append(Building(e[5], e[0], e[6], []))
 
         print("Made environments and added hosts for {}".format(self.name))
         print("Finished {}".format(self.name))
@@ -166,16 +160,30 @@ class City(container.Container):
     def getImmuneCount(self):
         count = 0
         for building in self.objects:
-            count += building.getImmuneCount()
+            if building.name == "House":
+                count += building.getImmuneCount()
 
         return count
 
     def getInfectedCount(self):
         count = 0
         for building in self.objects:
-            count += building.getInfectedCount()
+            if building.name == "House":
+                count += building.getInfectedCount()
 
         return count
+
+    def increment(self, disease):
+        for o in self.objects:
+            if o.name == "House":
+                for h in o.hosts:
+                    h.increment(disease)
+
+    def decrement(self, disease):
+        for o in self.objects:
+            if o.name == "House":
+                for h in o.hosts:
+                    h.decrement(disease)
 
     def getCommuters(self, percentage):
         toReturn = []
@@ -195,11 +203,12 @@ class City(container.Container):
                     o.hosts.append(hostObjects.pop(0))
             o.timeStep(disease, day)
         self.commutePopulation = random.sample(self.hosts, round(len(self.hosts)*(self.commutePercentage/100)))
+        self.increment(disease)
+        self.decrement(disease)
 
 
 class Country(container.Container):
     # Country will contain and interact between cities
-    # TODO Swap commuting populations
     def __init__(self, name):
         super().__init__(name)
         self.percentageMatrix = []
@@ -241,7 +250,7 @@ class Country(container.Container):
         # make halfway houses
         halfwayCount = (math.pow(len(self.objects)-1, 2) - len(self.objects)-1)/2  # Triangle numbers
         # TODO make list of used combination indexes?
-        self.halfwayHouses = [[Building("Everyday", "HalfwayHouse", 0.8, []) for x in range(len(cityDetails))] for y in range(len(cityDetails))]
+        self.halfwayHouses = [[Building("Everyday", "HalfwayHouse", 0.5, []) for x in range(len(cityDetails))] for y in range(len(cityDetails))]
         usedIndexes = []
         # TODO Make cities return the people to add to the halfway house
 
@@ -266,6 +275,7 @@ class Country(container.Container):
         for row in range(len(self.halfwayHouses[0])-1):
             for col in range(row+1, len(self.halfwayHouses[0])):
                 self.halfwayHouses[row][col].hosts += self.objects[row].getCommuters(self.percentageMatrix[row][col])
+                self.halfwayHouses[row][col].hosts += self.objects[col].getCommuters(self.percentageMatrix[col][row])
 
         # for cityFrom, row in enumerate(self.halfwayHouses):
         #     for cityTo, halfwayHouse in enumerate(row):

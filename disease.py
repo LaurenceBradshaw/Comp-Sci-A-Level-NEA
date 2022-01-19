@@ -9,3 +9,4 @@ class Disease(disease.Disease):
         self.infectionChance = 0.1
         self.duration = 14
         self.immunityProb = 100
+        # TODO populate this from the database

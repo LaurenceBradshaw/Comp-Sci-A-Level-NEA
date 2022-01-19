@@ -14,18 +14,21 @@ class Model(object):
         self.plotter = pltr.Plotter(db)
         self.db = db
 
-    def timeStep(self, country, res, i):
+    def timeStep(self, topLevel, res, i):
         dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         day = datetime.strptime(res, '%d-%m-%Y').weekday()
         # passes time on all places depending on the day of the week
         infected = 0
         prevInfected = 0
-        prevInfected += country.getInfectedCount()
-        country.timeStep(self.disease, dayName[day])
-        infected += country.getInfectedCount()
+        prevInfected += topLevel.getInfectedCount()
+        topLevel.timeStep(self.disease, dayName[day])
+        infected += topLevel.getInfectedCount()
 
-        for city in country.objects:
-            self.db.writeOutput(city.name, i, infected, city.getImmuneCount())
+        for o in topLevel.objects:
+            imm = o.getImmuneCount()
+            inf = o.getInfectedCount()
+            self.db.writeOutput(o.name, i, inf, imm)
+            print("{} - {}, {}".format(o.name, inf, imm))
 
         try:
             rNaught = infected/prevInfected

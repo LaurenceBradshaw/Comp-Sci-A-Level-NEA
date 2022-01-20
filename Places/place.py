@@ -249,24 +249,8 @@ class Country(container.Container):
 
         # make halfway houses
         halfwayCount = (math.pow(len(self.objects)-1, 2) - len(self.objects)-1)/2  # Triangle numbers
-        # TODO make list of used combination indexes?
-        self.halfwayHouses = [[Building("Everyday", "HalfwayHouse", 0.5, []) for x in range(len(cityDetails))] for y in range(len(cityDetails))]
+        self.halfwayHouses = [[Building("Everyday", "HalfwayHouse", 0.1, []) for x in range(len(cityDetails))] for y in range(len(cityDetails))]
         usedIndexes = []
-        # TODO Make cities return the people to add to the halfway house
-
-        # Pog 07/01/2022
-        # totalDistance = 0  # sum of all the inverse distances between cities
-        # for row in matrix:
-        #     for item in row:
-        #         totalDistance += item
-        #
-        # rowCounter = 0
-        # for row in matrix:
-        #     itemCounter = 0
-        #     for item in row:
-        #         self.percentageMatrix[rowCounter][itemCounter] = (item / totalDistance)
-        #         itemCounter += 1
-        #     rowCounter += 1
 
     def timeStep(self, disease, day):
         for o in self.objects:
@@ -276,11 +260,6 @@ class Country(container.Container):
             for col in range(row+1, len(self.halfwayHouses[0])):
                 self.halfwayHouses[row][col].hosts += self.objects[row].getCommuters(self.percentageMatrix[row][col])
                 self.halfwayHouses[row][col].hosts += self.objects[col].getCommuters(self.percentageMatrix[col][row])
-
-        # for cityFrom, row in enumerate(self.halfwayHouses):
-        #     for cityTo, halfwayHouse in enumerate(row):
-        #         if len(self.halfwayHouses[cityTo][cityFrom].hosts) == 0:
-        #             halfwayHouse.hosts += self.objects[cityFrom].getCommuters(self.percentageMatrix[cityFrom][cityTo])
 
         for row in self.halfwayHouses:
             for h in row:

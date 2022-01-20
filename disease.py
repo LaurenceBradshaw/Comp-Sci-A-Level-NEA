@@ -3,10 +3,10 @@ from Framework import disease
 
 class Disease(disease.Disease):
 
-    def __init__(self):
+    def __init__(self, diseaseDetails):
         super(Disease, self).__init__()
-        self.latencyPeriod = 2
-        self.infectionChance = 0.1
-        self.duration = 14
-        self.immunityProb = 100
-        # TODO populate this from the database
+        self.latencyPeriod = diseaseDetails[1]
+        self.infectionChance = diseaseDetails[2]
+        self.duration = diseaseDetails[0]
+        self.immunityProb = diseaseDetails[3]
+

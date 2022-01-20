@@ -52,3 +52,16 @@ class DatabaseHandler(object):
         # returns the percentage of the population that travel to different cities
         self.cursor.execute('select CommutePercentage from City where CityID = \'{}\''.format(cityName))
         return self.cursor.fetchall()
+
+    def getDisease(self, disease):
+        self.cursor.execute('select Duration, LatencyPeriod, InfectionChance, ImmuneProbability from Disease where DiseaseID = \'{}\''.format(disease))
+        return self.cursor.fetchall()[0]
+
+    def getRuntime(self):
+        self.cursor.execute('select RunTime from Simulation where SimulationConfiguration = {}'.format(self.configuration))
+        return self.cursor.fetchall()[0]
+
+    def getStartDate(self):
+        self.cursor.execute('select StartDate from Simulation where SimulationConfiguration = {}'.format(self.configuration))
+        date = self.cursor.fetchall()[0][0]
+        return [date.day, date.month, date.year]

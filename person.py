@@ -8,6 +8,7 @@ class Person(host.Host):
     def __init__(self):
         self.age = numberHandler.weightedRandom(1, 100, 35)
         super(Person, self).__init__()
+        self.immuneDuration = 0
 
     def getAge(self):
         return self.age
@@ -19,6 +20,8 @@ class Person(host.Host):
             self.infectedTime += 1
         if self.latencyTime >= disease.latencyPeriod:
             self.infectious = True
+        if self.immune:
+            self.immuneDuration += 1
 
     def decrement(self, disease):
         # removes infected status from people who have been infected for the disease duration
@@ -31,3 +34,7 @@ class Person(host.Host):
             x = random.randint(0, 100)
             if x < disease.immunityProb:
                 self.immune = True
+
+        if self.immuneDuration >= disease.immuneDuration:
+            self.immune = False
+            self.immuneDuration = 0

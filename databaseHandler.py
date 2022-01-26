@@ -1,12 +1,16 @@
 import pyodbc
+import os
 
 
 class DatabaseHandler(object):
 
     def __init__(self, config):
         # Makes a connection to the database
+        filename = os.path.join(os.path.expanduser("~"), "Documents/databaseRevised.accdb")
         conn_str = (r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
-                    r'DBQ=C:\Users\lozin\Documents\databaseRevised.accdb;')
+                    r'DBQ=' + filename + ';')
+        # conn_str = (r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
+        #           r'DBQ=C:\Users\lozin\Documents\databaseRevised.accdb;')
         conn = pyodbc.connect(conn_str)
         # Adds a cursor to the database connection
         self.cursor = conn.cursor()

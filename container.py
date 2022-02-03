@@ -5,6 +5,7 @@
 # - Country (contains cities)
 
 # Preprocessing must return one container to the main model script
+# TODO Make abstract
 class Container(object):
 
     def __init__(self, name):

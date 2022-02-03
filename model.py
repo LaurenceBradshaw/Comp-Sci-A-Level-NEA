@@ -10,7 +10,6 @@ class Model(object):
         self.startDate = date(startDate[2], startDate[1], startDate[0])
         self.disease = disease
         self.runtime = runtime
-        self.housesList = []
         self.plotter = pltr.Plotter(db)
         self.db = db
 

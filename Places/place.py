@@ -4,6 +4,7 @@ import numberHandler
 import person
 from Framework import environment, host
 import math
+import multiprocessing as mp
 
 
 class Building(environment.Environment):
@@ -266,19 +267,42 @@ class Country(container.Container):
                 h.timeStep(disease, day)
                 h.hosts = []
 
-    def getImmuneCount(self):
-        count = 0
-        for city in self.objects:
-            count += city.getImmuneCount()
-
-        return count
-
     def getInfectedCount(self):
         count = 0
-        for city in self.objects:
-            count += city.getInfectedCount()
-
+        for o in self.objects:
+            count += o.getInfectedCount()
         return count
+
+    def getImmuneCount(self):
+        count = 0
+        for o in self.objects:
+            count += o.getImmuneCount()
+        return count
+
+    def increment(self, disease):
+        for o in self.objects:
+            o.increment(disease)
+
+    def decrement(self, disease):
+        for o in self.objects:
+            o.decrement(disease)
+
+def unwrap_self_timestep(arg, **kwargs):
+    return Country.timeStep(*arg, **kwargs)
+    #
+    # def getImmuneCount(self):
+    #     count = 0
+    #     for city in self.objects:
+    #         count += city.getImmuneCount()
+    #
+    #     return count
+    #
+    # def getInfectedCount(self):
+    #     count = 0
+    #     for city in self.objects:
+    #         count += city.getInfectedCount()
+    #
+    #     return count
 
 # class Place(environment.Environment):
 

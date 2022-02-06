@@ -16,6 +16,7 @@ class Person(host.Host):
     def increment(self, disease):
         # increases time infected on people infected
         if self.infected and not self.immune:
+            print(self.infectedTime)
             self.latencyTime += 1
             self.infectedTime += 1
         if self.latencyTime >= disease.latencyPeriod:

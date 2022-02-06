@@ -2,6 +2,7 @@ import country
 import preprocessor_commond_cold as preprocessing
 import plotter as pltr
 from datetime import datetime, date, timedelta
+import time
 
 
 class Model(object):
@@ -37,6 +38,7 @@ class Model(object):
         print("{} - {} ({})/({}) = ({})".format(i, dayName[day], infected, prevInfected, rNaught))
 
     def run(self):
+        starTime = time.time()
         # does preprocessing (setting up all the places and people in them)
         p = preprocessing.Preprocessing(self.db)
         topLevel = p.preprocess(self.disease)
@@ -53,6 +55,7 @@ class Model(object):
 
         self.plotter.makePlot()
         print("Model Finished")
+        print("%s seconds" % (time.time() - starTime))
 
     def increment(self, topLevel):
         # increases time infected on all people infected

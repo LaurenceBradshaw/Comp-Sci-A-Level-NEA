@@ -67,22 +67,23 @@ class Preprocessing(preprocessor.Preprocessing):
         return topLevel
 
     def initialInfection(self, disease, topLevel):
-        cityNum = random.randint(0, len(topLevel.objects)-1)
-        c = topLevel.objects[cityNum]
-        buildingNum = random.randint(0, len(c.objects)-1)
-        building = c.objects[buildingNum]
-        if len(building.hosts) == 0:
-            building = c.objects[random.randint(0, len(c.objects)-1)]
-        hostNum = random.randint(0, len(building.hosts)-1)
-        toInfect = building.hosts[hostNum]
-        toInfect.infected = True
-        toInfect.infectious = True
-        toInfect.infectedTime = 1
-        toInfect.latencyTime = disease.latencyPeriod
-        print("Initial Infection Location:")
-        print("City: {}".format(cityNum))
-        print("Building: {}".format(buildingNum))
-        print("Host: {}".format(hostNum))
+        try:
+            cityNum = random.randint(0, len(topLevel.objects)-1)
+            c = topLevel.objects[cityNum]
+            buildingNum = random.randint(0, len(c.objects)-1)
+            building = c.objects[buildingNum]
+            hostNum = random.randint(0, len(building.hosts)-1)
+            toInfect = building.hosts[hostNum]
+            toInfect.infected = True
+            toInfect.infectious = True
+            toInfect.infectedTime = 1
+            toInfect.latencyTime = disease.latencyPeriod
+            print("Initial Infection Location:")
+            print("City: {}".format(cityNum))
+            print("Building: {}".format(buildingNum))
+            print("Host: {}".format(hostNum))
+        except IndexError:
+            self.initialInfection(disease, topLevel)
 
     def makeMatrix(self, cityInfo):
         counter1 = 0

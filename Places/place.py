@@ -5,6 +5,10 @@ import person
 from Framework import environment, host
 import math
 import multiprocessing as mp
+import time
+import databaseHandler
+from queue import Queue
+from threading import Thread
 
 
 class Building(environment.Environment):
@@ -175,16 +179,12 @@ class City(container.Container):
         return count
 
     def increment(self, disease):
-        for o in self.objects:
-            if o.name == "House":
-                for h in o.hosts:
-                    h.increment(disease)
+        for h in self.hosts:
+            h.increment(disease)
 
     def decrement(self, disease):
-        for o in self.objects:
-            if o.name == "House":
-                for h in o.hosts:
-                    h.decrement(disease)
+        for h in self.hosts:
+            h.decrement(disease)
 
     def getCommuters(self, percentage):
         toReturn = []
@@ -199,9 +199,9 @@ class City(container.Container):
             if o.name == "Shop":
                 numToTake = numberHandler.weightedRandom(self.shopRange[0], self.shopRange[1], self.shopRange[2])
                 o.hosts = []
-                random.shuffle(o.hosts)
+                # random.shuffle(hostObjects)
                 for _ in range(numToTake):
-                    o.hosts.append(hostObjects.pop(0))
+                    o.hosts.append(hostObjects.pop(random.randint(0, len(hostObjects)-1)))
             o.timeStep(disease, day)
         self.commutePopulation = random.sample(self.hosts, round(len(self.hosts)*(self.commutePercentage/100)))
         self.increment(disease)
@@ -215,6 +215,9 @@ class Country(container.Container):
         self.percentageMatrix = []
         self.halfwayHouses = []
 
+    def cityPopulate(self, city, db):
+        city.populate(db)
+
     def populate(self, db):
         cityDetails = db.getCities()
 
@@ -223,9 +226,21 @@ class Country(container.Container):
         for cityStuff in enumerate(cityDetails):
             self.objects.append(City(cityStuff[1][0], cityStuff[1][1], cityStuff[1][2], cityStuff[1][3]))
 
+        startTime = time.time()
         for city in self.objects:
             city.populate(db)
 
+        # process_list = []
+        # for city in self.objects:
+        # # for i in range(len(self.objects)):
+        #     p = mp.Process(target=self.cityPopulate, args=[city, db])
+        #     p.start()
+        #     process_list.append(p)
+        #
+        # for process in process_list:
+        #     process.join()
+
+        print("%s seconds" % (time.time() - startTime))
         print("Finished All Cities")
         print("Making City Matrix...")
 
@@ -253,9 +268,36 @@ class Country(container.Container):
         self.halfwayHouses = [[Building("Everyday", "HalfwayHouse", 0.1, []) for x in range(len(cityDetails))] for y in range(len(cityDetails))]
         usedIndexes = []
 
+    # def cityTimeStep(self, city):
+    #     print(city.name)
+    #     city.timeStep(self.disease, self.day)
+
     def timeStep(self, disease, day):
+        # self.disease = disease
+        # self.day = day
+        # jobs = Queue()
+        # for i in self.objects:
+        #     jobs.put(i)
+        # # pool = mp.Pool(processes=2)
+        # worker = Thread(unwrap_self_cityTimeStep, zip([self] * len(self.objects), self.objects))
+        # worker.start()
+        #
+        # jobs.join()
+        #
         for o in self.objects:
             o.timeStep(disease, day)
+
+        # process_list = []
+        # for o in self.objects:
+        #     p = mp.Process(target=o.timeStep, args=(disease, day))
+        #     p.start()
+        #     process_list.append(p)
+        #
+        # for process in process_list:
+        #     process.join()
+
+        # 401.8026111125946 Seconds in parallel (100 time steps, two cities, plymouth and exeter)
+        # 337.1786530017853 sec not in parallel
 
         for row in range(len(self.halfwayHouses[0])-1):
             for col in range(row+1, len(self.halfwayHouses[0])):
@@ -286,9 +328,11 @@ class Country(container.Container):
     def decrement(self, disease):
         for o in self.objects:
             o.decrement(disease)
+#
+# def unwrap_self_cityTimeStep(arg, **kwarg):
+#     return Country.cityTimeStep(*arg, **kwarg)
+#
 
-def unwrap_self_timestep(arg, **kwargs):
-    return Country.timeStep(*arg, **kwargs)
     #
     # def getImmuneCount(self):
     #     count = 0

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import people
 
 
 # The object that contains hosts
@@ -46,4 +45,22 @@ class Environment(ABC):
     @abstractmethod
     def timeStep(self, disease, day):
         pass
+
+    @abstractmethod
+    def getInfectedCount(self):
+        # returns the number of infected hosts
+        count = 0
+        for h in self.hosts:
+            if h.infected:
+                count += 1
+        return count
+
+    @abstractmethod
+    def getImmuneCount(self):
+        # Returns the number of immune hosts
+        count = 0
+        for h in self.hosts:
+            if h.immune:
+                count += 1
+        return count
 

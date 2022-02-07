@@ -9,5 +9,5 @@ class Disease(disease.Disease):
         self.infectionChance = diseaseDetails[2]
         self.duration = diseaseDetails[0]
         self.immunityProb = diseaseDetails[3]
-        self.immuneDuration = 30
+        self.immuneDuration = diseaseDetails[4]
 

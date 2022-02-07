@@ -1,10 +1,7 @@
 import math
 from Framework import preprocessor
-import person
-from Places import city
-from Places import place
+import place
 import random
-import country
 
 
 class Preprocessing(preprocessor.Preprocessing):

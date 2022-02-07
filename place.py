@@ -1,61 +1,89 @@
 import random
-import container
 import numberHandler
 import person
-from Framework import environment, host
+from Framework import environment, container
 import math
-import multiprocessing as mp
 import time
-import databaseHandler
-from queue import Queue
-from threading import Thread
 
 
 class Building(environment.Environment):
-    # Building class will contain hosts and handle their interactions
+    """
+    Building class will contain hosts and handle their interactions
+    """
     def __init__(self, activePeriod, name, infectionMultiplier, hostObjects):
+        """
+        Constructor for the building class
+
+        :param activePeriod: List of days that the building will be active (input: string)
+        :param name: Name of the building type (string)
+        :param infectionMultiplier: A measure of how much the hosts interact with each other (0 - 0.99)
+        :param hostObjects: A lists of all the host objects that the building will contain (list)
+        """
         super(Building, self).__init__(name, activePeriod, infectionMultiplier)
-        self.populate(hostObjects)
+        # Adds the input host objects to the buildings host population
+        self.hosts = hostObjects
+        # Converts the input active period into the days it represents
         if activePeriod == "Everyday":
             self.activePeriod = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         elif activePeriod == "Weekdays":
             self.activePeriod = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
-    def populate(self, hostObjects):
-        for p in hostObjects:
-            self.hosts.append(p)
-
     def getImmuneCount(self):
+        """
+        Counts the number of immune hosts in the building
+        :return: The number of immune hosts as an int
+        """
         # Returns the number of immune hosts
-        count = 0
-        for h in self.hosts:
-            if h.immune:
-                count += 1
-        return count
+        # count = 0
+        # for h in self.hosts:
+        #     if h.immune:
+        #         count += 1
+        return super().getImmuneCount()
 
     def getInfectedCount(self):
+        """
+        Counts the number of infected hosts in the building
+        :return: The number of infected hosts as an int
+        """
         # Returns the number of infected hosts
-        count = 0
-        for h in self.hosts:
-            if h.infected:
-                count += 1
-        return count
+        # count = 0
+        # for h in self.hosts:
+        #     if h.infected:
+        #         count += 1
+        return super().getInfectedCount()
 
     def timeStep(self, disease, day):
-        # Runs the calculations to infect new hosts
-        if day in self.activePeriod:
-            infectedHosts = self.getInfectedHosts()
-            uninfectedHosts = self.getUninfectedHosts()
+        """
+        Simulates a day progressing on the building
 
+        :param disease: The disease the simulation is running
+        :param day: The day that is currently being run
+        """
+        # Runs the calculations to infect new hosts
+        # If the building should run given the day
+        if day in self.activePeriod:
+            # Gets the infected host objects
+            infectedHosts = self.getInfectedHosts()
+            # If there are infected hosts in the environment
             if len(infectedHosts) != 0:
+                # Gets the uninfected host objects
+                uninfectedHosts = self.getUninfectedHosts()
+                # Foreach infected host
                 for _ in infectedHosts:
+                    # Calculate their interactions with the other hosts in the building
                     interactions = min(round(numberHandler.generatePoisson(self.infectionMultiplier)), len(uninfectedHosts))
+                    # Foreach uninfected host that the infected host has come into contact with
                     for uip in random.sample(uninfectedHosts, interactions):
+                        # See if they get infected
                         if random.randint(0, 100) < (disease.infectionChance * 100):
                             uip.infected = True
 
     def getInfectedHosts(self):
-        # Returns the infected host objects
+        """
+        Gets the objects of the hosts which are infected
+
+        :return: The objects of the infected hosts
+        """
         infectedHosts = []
         for h in self.hosts:
             if h.infected:
@@ -63,7 +91,11 @@ class Building(environment.Environment):
         return infectedHosts
 
     def getUninfectedHosts(self):
-        # Returns the uninfected host objects that can be infected
+        """
+        Gets the objects of the hosts which are uninfected
+
+        :return: The objects of the uninfected hosts
+        """
         uninfectedHosts = []
         for h in self.hosts:
             if not h.infected and not h.immune:
@@ -71,18 +103,39 @@ class Building(environment.Environment):
         return uninfectedHosts
 
     def increment(self, disease):
+        """
+        Increment each host
+
+        :param disease: The disease the simulation is running
+        """
         for h in self.hosts:
             h.increment(disease)
 
     def decrement(self, disease):
+        """
+        Decrement each host
+
+        :param disease: The disease the simulation is running
+        """
         for h in self.hosts:
             h.decrement(disease)
 
 
 class City(container.Container):
-    # City will contain and interact between the buildings
-
+    """
+    Class which inherits from Container
+    Contains environments
+    Handle interactions between the buildings
+    """
     def __init__(self, name, long, lat, commutePercentage):
+        """
+        Constructor for the city class
+
+        :param name: Name of the city
+        :param long: Longitude of the city
+        :param lat: Latitude of the city
+        :param commutePercentage: Percentage of the population that will travel to a different city
+        """
         super().__init__(name)
         self.longitude = long
         self.latitude = lat
@@ -92,9 +145,13 @@ class City(container.Container):
         self.shopRange = []
 
     def populate(self, db):
-        # Makes all the environments the city contains
+        """
+        Sets up the city
+
+        :param db: The database handler class for accessing the database
+        """
         print("Making host objects for {}...".format(self.name))
-        # Makes host classes for the city
+        # Makes all the hosts that the city will contain
         hostCount = db.getHostCount(self.name)[0]
         for x in range(hostCount):
             self.hosts.append(person.Person())
@@ -102,10 +159,12 @@ class City(container.Container):
         print("Made host objects for {}".format(self.name))
         print("Sorting host objects for {}...".format(self.name))
 
+        # Lists used to hold the hosts once they have been sorted out by age
         hostsInEducation = []
         hostsInEmployment = []
         hostsRetired = []
 
+        # Sorts the hosts out by age
         for h in self.hosts:
             if h.age <= 18:
                 hostsInEducation.append(h)
@@ -117,12 +176,15 @@ class City(container.Container):
         print("Sorted host objects for {}".format(self.name))
         print("Making environments and adding hosts for {}...".format(self.name))
 
+        # Gets the information about all the environments the city will contain
         environmentInfo = db.getEnvironments(self.name)
 
+        # Makes a copy of the hosts list
         hostObjects = self.hosts.copy()
         # for o in self.objects:
         #     hostObjects += o.hosts
 
+        # TODO: Sort out host objects into a dictionary and then make following code a loop with e[0] as the key
         for e in environmentInfo:
             if e[0] == "House":
                 for x in range(e[1]):
@@ -163,30 +225,53 @@ class City(container.Container):
         print("Finished {}".format(self.name))
 
     def getImmuneCount(self):
+        """
+        Counts the number of immune hosts objects in each building
+        Checks if the building name is "House" so that hosts are not double counted
+        :return: The number of immune hosts as an int
+        """
         count = 0
         for building in self.objects:
             if building.name == "House":
                 count += building.getImmuneCount()
-
         return count
 
     def getInfectedCount(self):
+        """
+        Counts the number of infected hosts objects in each building
+        Checks if the building name is "House" so that hosts are not double counted
+        :return: the number of infected hosts as an int
+        """
         count = 0
         for building in self.objects:
             if building.name == "House":
                 count += building.getInfectedCount()
-
         return count
 
     def increment(self, disease):
+        """
+        Runs increment method on each host
+
+        :param disease: The disease that the simulation is running
+        """
         for h in self.hosts:
             h.increment(disease)
 
     def decrement(self, disease):
+        """
+        Runs decrement method on each host
+
+        :param disease: The disease that the simulation is running
+        """
         for h in self.hosts:
             h.decrement(disease)
 
     def getCommuters(self, percentage):
+        """
+        Gets the host objects that will travel out of the city for that time step
+        :param percentage: The percentage of hosts to take
+        :return: The host objects that will travel out of the city
+        """
         toReturn = []
         numToReturn = round(len(self.commutePopulation)*percentage)
         for x in range(numToReturn):
@@ -194,45 +279,74 @@ class City(container.Container):
         return toReturn
 
     def timeStep(self, disease, day):
+        """
+        Simulates a day progressing in the city
+
+        :param disease: The disease the simulation is running
+        :param day: The name of the day that is being simulated
+        """
+        # Make a copy of the host objects
         hostObjects = self.hosts.copy()
         for o in self.objects:
+            # If the building is a shop (getting the shops population for the day)
             if o.name == "Shop":
+                # Find how many hosts will visit this shop
                 numToTake = numberHandler.weightedRandom(self.shopRange[0], self.shopRange[1], self.shopRange[2])
                 o.hosts = []
-                # random.shuffle(hostObjects)
+                # Randomly take these hosts from the copied host list and append them to the shop
                 for _ in range(numToTake):
                     o.hosts.append(hostObjects.pop(random.randint(0, len(hostObjects)-1)))
+            # Runs time step on the building
             o.timeStep(disease, day)
-        self.commutePopulation = random.sample(self.hosts, round(len(self.hosts)*(self.commutePercentage/100)))
+        # Updates the commuting population
+        # self.commutePopulation = random.sample(self.hosts, round(len(self.hosts)*(self.commutePercentage/100)))
+        # Runs the increment and decrement methods on all the buildings in the city
         self.increment(disease)
         self.decrement(disease)
 
 
 class Country(container.Container):
-    # Country will contain and interact between cities
+    """
+    A class which inherits from Container
+    Will contain cities
+    Handles interactions between cities
+    Is this framework implementations top level environment
+    """
     def __init__(self, name):
+        """
+        Constructor for the country
+
+        :param name: the name of the country (is left blank because its not used anywhere and doesn't need one)
+        """
         super().__init__(name)
         self.percentageMatrix = []
         self.halfwayHouses = []
 
-    def cityPopulate(self, city, db):
-        city.populate(db)
+    # def cityPopulate(self, city, db):
+    #     city.populate(db)
 
     def populate(self, db):
+        """
+        Sets up the country
+
+        :param db: The database handler class for accessing the database
+        """
+        # Get the information about the cities contained in the country
         cityDetails = db.getCities()
 
         print("Retrieved City Information")
 
+        # Makes the cities
         for cityStuff in enumerate(cityDetails):
             self.objects.append(City(cityStuff[1][0], cityStuff[1][1], cityStuff[1][2], cityStuff[1][3]))
 
+        # Populate the cities
         startTime = time.time()
         for city in self.objects:
             city.populate(db)
 
         # process_list = []
         # for city in self.objects:
-        # # for i in range(len(self.objects)):
         #     p = mp.Process(target=self.cityPopulate, args=[city, db])
         #     p.start()
         #     process_list.append(p)
@@ -252,8 +366,10 @@ class Country(container.Container):
             for counter2, city2 in enumerate(cityDetails):
                 if city1[0] != city2[0]:
                     distance = math.sqrt(math.pow(city1[1] - city2[1], 2) + math.pow(city1[2] - city2[2], 2))
-                    matrix[counter1][counter2] = 1 / distance  # inverts the distance as number of people traveling will be inversely proportional to the distance
+                    # inverts the distance as number of people traveling will be inversely proportional to the distance
+                    matrix[counter1][counter2] = 1 / distance
 
+        # Turns the distance into a percentage from each city
         for rowNum, row in enumerate(matrix):
             rowDistance = 0
             for item in row:
@@ -263,16 +379,21 @@ class Country(container.Container):
 
         print("Made City Matrix")
 
-        # make halfway houses
-        halfwayCount = (math.pow(len(self.objects)-1, 2) - len(self.objects)-1)/2  # Triangle numbers
+        # Make halfway houses between cities
         self.halfwayHouses = [[Building("Everyday", "HalfwayHouse", 0.1, []) for x in range(len(cityDetails))] for y in range(len(cityDetails))]
-        usedIndexes = []
 
     # def cityTimeStep(self, city):
     #     print(city.name)
     #     city.timeStep(self.disease, self.day)
 
     def timeStep(self, disease, day):
+        """
+        Simulates a day progressing in the country
+        :param disease: The disease the simulation is running
+        :param day: The current day that is being run
+        """
+        for o in self.objects:
+            o.timeStep(disease, day)
         # self.disease = disease
         # self.day = day
         # jobs = Queue()
@@ -284,8 +405,6 @@ class Country(container.Container):
         #
         # jobs.join()
         #
-        for o in self.objects:
-            o.timeStep(disease, day)
 
         # process_list = []
         # for o in self.objects:
@@ -299,92 +418,55 @@ class Country(container.Container):
         # 401.8026111125946 Seconds in parallel (100 time steps, two cities, plymouth and exeter)
         # 337.1786530017853 sec not in parallel
 
+        # Populates the halfway houses
+        # Halfway houses are used to simulate hosts going between cities and interacting with each other
         for row in range(len(self.halfwayHouses[0])-1):
             for col in range(row+1, len(self.halfwayHouses[0])):
                 self.halfwayHouses[row][col].hosts += self.objects[row].getCommuters(self.percentageMatrix[row][col])
                 self.halfwayHouses[row][col].hosts += self.objects[col].getCommuters(self.percentageMatrix[col][row])
 
+        # Progresses time on each halfway house
         for row in self.halfwayHouses:
             for h in row:
                 h.timeStep(disease, day)
                 h.hosts = []
 
     def getInfectedCount(self):
-        count = 0
-        for o in self.objects:
-            count += o.getInfectedCount()
-        return count
+        """
+        Gets the number of infected hosts in the country
+        :return: The number of infected hosts as an int
+        """
+        # count = 0
+        # for o in self.objects:
+        #     count += o.getInfectedCount()
+        return super().getInfectedCount()
 
     def getImmuneCount(self):
-        count = 0
-        for o in self.objects:
-            count += o.getImmuneCount()
-        return count
+        """
+        Gets the number of immune hosts in the country
+        :return: The number of immune hosts as an int
+        """
+        # count = 0
+        # for o in self.objects:
+        #     count += o.getImmuneCount()
+        return super().getImmuneCount()
 
     def increment(self, disease):
-        for o in self.objects:
-            o.increment(disease)
+        """
+        Calls the increment method on each city
+
+        :param disease: The disease the simulation is running
+        """
+        # for o in self.objects:
+        #     o.increment(disease)
+        super().increment(disease)
 
     def decrement(self, disease):
-        for o in self.objects:
-            o.decrement(disease)
-#
-# def unwrap_self_cityTimeStep(arg, **kwarg):
-#     return Country.cityTimeStep(*arg, **kwarg)
-#
+        """
+        Calls the decrement method on each city
 
-    #
-    # def getImmuneCount(self):
-    #     count = 0
-    #     for city in self.objects:
-    #         count += city.getImmuneCount()
-    #
-    #     return count
-    #
-    # def getInfectedCount(self):
-    #     count = 0
-    #     for city in self.objects:
-    #         count += city.getInfectedCount()
-    #
-    #     return count
-
-# class Place(environment.Environment):
-
-    # def __init__(self, name, lb, ub, activePeriod, infectionMultiplier):
-    #     super(Place, self).__init__(name, self.convertActivePeriod(activePeriod), infectionMultiplier)
-    #     self.lowerBound = lb
-    #     self.upperBound = ub
-    #
-    # def convertActivePeriod(self, activePeriod):
-    #     if activePeriod == "Everyday":
-    #         return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    #     elif activePeriod == "Weekdays":
-    #         return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-    #
-    # def populate(self, people, avg):
-    #     return self.people.populate(people, self.lowerBound, self.upperBound, avg)
-    #
-    # def timeStep(self, disease):
-    #     uninfectedPeopleList = self.people.getUninfectedPeople()
-    #     infectedPeopleList = self.people.getInfectedPeople()
-    #
-    #     if len(infectedPeopleList) != 0:
-    #         for _ in infectedPeopleList:
-    #             interactions = min(round(numberHandler.generatePoisson(self.infectionMultiplier)), len(uninfectedPeopleList))
-    #             for uip in random.sample(uninfectedPeopleList, interactions):
-    #                 if random.randint(0, 100) < (disease.infectionChance * 100):
-    #                     uip.infected = True
-
-        # gets the number of people to infect
-#        numToInfect = min(round(numberHandler.generatePoisson(self.infectionMultiplier)), len(uninfectedPeopleList))
-
-#        # calculates the probability of there being an infection in the place
-#        probability = 0
-#        for _ in infectedPeopleList:
-#            probability += disease.infectionChance
-
-#        # if the probability is hit then people are infected
-#        if random.randint(0, 100) < probability * 100 and numToInfect > 0:
-#            peopleToInfect = random.sample(uninfectedPeopleList, numToInfect)
-#            for personToInfect in peopleToInfect:
-#                personToInfect.infected = True
+        :param disease: The disease the simulation is running
+        """
+        # for o in self.objects:
+        #     o.decrement(disease)
+        super().decrement(disease)

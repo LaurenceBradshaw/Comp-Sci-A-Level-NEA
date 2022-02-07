@@ -2,12 +2,18 @@ from abc import ABC, abstractmethod
 
 
 class Disease(ABC):
-
+    """
+    Abstract class for a disease
+    """
     def __init__(self):
         self._latencyPeriod = 0
         self._infectionChance = 0
         self._duration = 0
         self._immunityProb = 100
+
+    ##########
+    # Properties
+    ##########
 
     @property
     def latencyPeriod(self):
@@ -24,6 +30,10 @@ class Disease(ABC):
     @property
     def immunityProb(self):
         return self._immunityProb
+
+    ##########
+    # Property setters
+    #########
 
     @latencyPeriod.setter
     def latencyPeriod(self, value):

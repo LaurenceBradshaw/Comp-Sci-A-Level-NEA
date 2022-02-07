@@ -1,4 +1,3 @@
-import country
 import preprocessor_commond_cold as preprocessing
 import plotter as pltr
 from datetime import datetime, date, timedelta

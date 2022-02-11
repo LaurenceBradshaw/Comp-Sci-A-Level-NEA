@@ -24,3 +24,17 @@ def weightedRandom(lb, ub, avg):
         if lb <= x[0] <= ub:
             valid = True
     return round(x[0])
+
+
+def coordsToDistance(lon1, lon2, lat1, lat2):
+    # R = 3959.87433  # this is in miles.  For Earth radius in kilometers use 6372.8 km
+    R = 6372.8
+    dLat = math.radians(lat2 - lat1)
+    dLon = math.radians(lon2 - lon1)
+    lat1 = math.radians(lat1)
+    lat2 = math.radians(lat2)
+
+    a = math.sin(dLat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dLon / 2) ** 2
+    c = 2 * math.asin(math.sqrt(a))
+
+    return R * c

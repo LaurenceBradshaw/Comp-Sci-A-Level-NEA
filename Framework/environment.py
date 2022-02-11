@@ -1,13 +1,22 @@
 from abc import ABC, abstractmethod
 
 
-# The object that contains hosts
 class Environment(ABC):
+    """
+    Abstract class for the place where the hosts are
+    """
 
-    def __init__(self, name, activePeriod, infectionMultiplier):
+    def __init__(self, name, activePeriod, interactionRate):
+        """
+        Constructor for an environment
+        
+        :param name: Name for the environment
+        :param activePeriod: The days/times when the hosts are in the environment and can infect each other/be infected
+        :param interactionRate: The amount the hosts mix with one another (determines the number of interactions)
+        """
         self._activePeriod = activePeriod
         self._hosts = []
-        self._infectionMultiplier = infectionMultiplier
+        self._interactionRate = interactionRate
         self._name = name
 
     @property
@@ -19,8 +28,8 @@ class Environment(ABC):
         return self._hosts
 
     @property
-    def infectionMultiplier(self):
-        return self._infectionMultiplier
+    def interactionRate(self):
+        return self._interactionRate
 
     @property
     def name(self):
@@ -34,9 +43,9 @@ class Environment(ABC):
     def hosts(self, value):
         self._hosts = value
 
-    @infectionMultiplier.setter
-    def infectionMultiplier(self, value):
-        self._infectionMultiplier = value
+    @interactionRate.setter
+    def interactionRate(self, value):
+        self._interactionRate = value
 
     @name.setter
     def name(self, value):

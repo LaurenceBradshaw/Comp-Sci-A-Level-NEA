@@ -1,15 +1,24 @@
 from abc import ABC, abstractmethod
 
 
-# The object that gets infected
 class Host(ABC):
-
+    """
+    Abstract class for a host
+    The object that gets infected
+    """
     def __init__(self):
+        """
+        The constructor for the host class
+        """
         self._infected = False
         self._infectious = False
         self._latencyTime = 0
         self._infectedTime = 0
         self._immune = False
+
+    ##########
+    # Properties
+    ##########
 
     @property
     def infectious(self):
@@ -31,6 +40,10 @@ class Host(ABC):
     def infected(self):
         return self._infected
 
+    ##########
+    # Property Setters
+    ##########
+
     @infected.setter
     def infected(self, value):
         self._infected = value
@@ -50,6 +63,10 @@ class Host(ABC):
     @infectious.setter
     def infectious(self, value):
         self._infectious = value
+
+    ##########
+    # Methods
+    ##########
 
     @abstractmethod
     def increment(self, disease):

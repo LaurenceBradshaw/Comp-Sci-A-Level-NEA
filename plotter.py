@@ -5,8 +5,15 @@ import os
 
 
 class Plotter(plotter.Plotter):
-
+    """
+    Class which does all the plotting for the model
+    """
     def __init__(self, db):
+        """
+        Constructor for the plotter
+
+        :param db: The class which handles all interactions with the database
+        """
         super(Plotter, self).__init__()
         self.db = db
         self.cities = self.db.getCities()
@@ -15,7 +22,9 @@ class Plotter(plotter.Plotter):
             self.output.append(pd.DataFrame(columns=['Day', 'Infected', 'Immunities']))
 
     def makePlot(self):
-        # outputs the final plot for each city
+        """
+        Outputs the final plot for each city once the simulation has finished running
+        """
         for num, city in enumerate(self.cities):
             ax = plt.gca()
 
@@ -24,14 +33,16 @@ class Plotter(plotter.Plotter):
             plt.xticks(rotation=20)
 
             filename = os.path.join(os.getcwd(), "Output/{}Output.png".format(city[0]))
-            # filename = 'C:/Users/lozin/Documents/Projects/{}Output.png'.format(city[0])
             plt.savefig(filename)
             plt.close()
             print("Plot made for {}".format(city[0]))
 
     def updateOutput(self, i, topLevel):
-        # gets the number of people infected and immune people on day 'i' to plot on graph
+        """
+        Updates the pandas dataframe with the hosts infected and immune for the day that was just simulated
 
+        :param i: The number of days passed since the simulation started
+        :param topLevel: The container that contains all other containers
+        """
         for num, city in enumerate(topLevel.objects):
-            self.output[num] = self.output[num].append({'Day': i, 'Infected': city.getInfectedCount(), 'Immunities': city.getImmuneCount()},
-                                    ignore_index=True)
+            self.output[num] = self.output[num].append({'Day': i, 'Infected': city.getInfectedCount(), 'Immunities': city.getImmuneCount()}, ignore_index=True)

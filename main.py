@@ -5,11 +5,16 @@ import databaseHandler
 if __name__ == '__main__':
     configurationNumber = 1
 
+    # Makes a connection to the database
     dbHandler = databaseHandler.DatabaseHandler(configurationNumber)
+    # Gets the starting date for the simulation
     startDate = dbHandler.getStartDate()
+    # Gets the amount of time that the simulation will run for
     runtime = dbHandler.getRuntime()[0]
-    disease = disease.Disease(dbHandler.getDisease("Common Cold"))
+    # Makes the disease that the simulation will model
+    disease = disease.Disease(dbHandler.getDisease())
 
-    # TODO for modeling vectors record the number of vectors that will be in each environment. Then use those numbers when infecting. instead of for each infected person it will be for each vector
+    # Makes the model
     model = model.Model(disease, runtime, startDate, dbHandler)
+    # Runs the model
     model.run()

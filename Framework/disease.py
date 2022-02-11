@@ -6,6 +6,9 @@ class Disease(ABC):
     Abstract class for a disease
     """
     def __init__(self):
+        """
+        Constructor for the disease
+        """
         self._latencyPeriod = 0
         self._infectionChance = 0
         self._duration = 0

@@ -8,6 +8,5 @@ class Disease(disease.Disease):
         self.latencyPeriod = diseaseDetails[1]
         self.infectionChance = diseaseDetails[2]
         self.duration = diseaseDetails[0]
-        self.immunityProb = diseaseDetails[3]
-        self.immuneDuration = diseaseDetails[4]
+        self.immuneDuration = diseaseDetails[3]
 

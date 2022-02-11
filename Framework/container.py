@@ -11,7 +11,6 @@ class Container(ABC):
 
     The preprocessing must return one top level container (not contained by anything itself)
     """
-
     def __init__(self, name):
         self._objects = []
         self._name = name

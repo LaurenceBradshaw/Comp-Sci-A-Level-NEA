@@ -17,7 +17,6 @@ class DatabaseHandler(object):
 
         :param config: the config number of the simulation that is being run
         """
-
         # Database file path and connection string
         filename = os.path.join(os.path.expanduser("~"), "Documents/databaseRevised.accdb")
         conn_str = (r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
@@ -39,7 +38,6 @@ class DatabaseHandler(object):
         :param time: Time elapsed in the simulation
         :param infectedCount: The number of infected hosts at time param
         :param immuneCount: The number of immune hosts at time param
-        :return: N/A
         """
         self.cursor.execute('insert into Output (Iteration, SimulationConfiguration, CityID, TimeElapsed, InfectedHosts, ImmuneHosts)'
                             'values ({},{},\'{}\',{},{},{})'.format(self.iteration, self.configuration, cityName, time, infectedCount, immuneCount))
@@ -47,12 +45,13 @@ class DatabaseHandler(object):
 
     def getIteration(self):
         """
-        Selects all the records from the Output table where the TimeElapsed is 0 (to reduce the number of records returned)
+        Selects all the records from the Output table where the TimeElapsed is 1 (to reduce the number of records returned)
         Finds the largest number and then adds one for the current simulation
+        Iteration is the number of that run for the configuration
 
         :return: Largest iteration number + 1
         """
-        self.cursor.execute('select Iteration from Output where TimeElapsed = 0')
+        self.cursor.execute('select Iteration from Output where TimeElapsed = 1 and SimulationConfiguration = {}'.format(self.configuration))
         largest = 0
         returned = self.cursor.fetchall()
         for iteration in returned:
@@ -89,12 +88,12 @@ class DatabaseHandler(object):
     def getEnvironments(self, cityName):
         """
         Gets the environments, the number of them, and the population average and bounds,
-        days where the environment is active and the InfectionMultiplier for the specified city
+        days where the environment is active and the interactionRate for the specified city
 
         :param cityName: The name of the city of which to fetch the data for
-        :return: EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, InfectionMultiplier as a pyodbc row
+        :return: EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate as a pyodbc row
         """
-        self.cursor.execute('select CityEnvironments.EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, InfectionMultiplier '
+        self.cursor.execute('select CityEnvironments.EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate '
                             'from CityEnvironments inner join Environments on CityEnvironments.EnvironmentType = Environments.EnvironmentType '
                             'where CityEnvironments.CityID = \'{}\''.format(cityName))
         return self.cursor.fetchall()
@@ -109,14 +108,16 @@ class DatabaseHandler(object):
         self.cursor.execute('select CommutePercentage from City where CityID = \'{}\''.format(cityName))
         return self.cursor.fetchall()
 
-    def getDisease(self, disease):
+    def getDisease(self):
         """
         Gets the information about the disease from the disease table
 
         :param disease: The name of the disease of which to fetch the data for
         :return:
         """
-        self.cursor.execute('select Duration, LatencyPeriod, InfectionChance, ImmuneProbability, ImmuneDuration from Disease where DiseaseID = \'{}\''.format(disease))
+        self.cursor.execute('select Disease from Simulation where SimulationConfiguration = {}'.format(self.configuration))
+        disease = self.cursor.fetchall()[0][0]
+        self.cursor.execute('select Duration, LatencyPeriod, InfectionChance, ImmuneDuration from Disease where DiseaseID = \'{}\''.format(disease))
         return self.cursor.fetchall()[0]
 
     def getRuntime(self):

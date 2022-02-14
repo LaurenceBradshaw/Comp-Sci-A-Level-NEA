@@ -70,5 +70,19 @@ class Host(ABC):
 
     @abstractmethod
     def increment(self, disease):
+        """
+        Increments values on the host
+
+        :param disease: The disease class that the model will run for (disease)
+        """
+        pass
+
+    @abstractmethod
+    def decrement(self, disease):
+        """
+        Decrements values on the host
+
+        :param disease: The disease class that the model will run for (disease)
+        """
         pass
 

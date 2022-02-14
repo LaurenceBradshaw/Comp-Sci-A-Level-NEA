@@ -5,14 +5,13 @@ class Environment(ABC):
     """
     Abstract class for the place where the hosts are
     """
-
     def __init__(self, name, activePeriod, interactionRate):
         """
         Constructor for an environment
         
-        :param name: Name for the environment
-        :param activePeriod: The days/times when the hosts are in the environment and can infect each other/be infected
-        :param interactionRate: The amount the hosts mix with one another (determines the number of interactions)
+        :param name: Name for the environment (string)
+        :param activePeriod: The days/times when the hosts are in the environment and can infect each other/be infected (list)
+        :param interactionRate: The amount the hosts mix with one another (determines the number of interactions) (float)
         """
         self._activePeriod = activePeriod
         self._hosts = []
@@ -53,11 +52,20 @@ class Environment(ABC):
 
     @abstractmethod
     def timeStep(self, disease, day):
+        """
+        Simulates a day on the environment
+
+        :param disease: The disease class that the model will run for (disease)
+        :param day: The current day that is being simulated (string)
+        """
         pass
 
     @abstractmethod
     def getInfectedCount(self):
-        # returns the number of infected hosts
+        """
+        Gets the number of infected hosts in the environment
+        :return: The number of infected hosts (int)
+        """
         count = 0
         for h in self.hosts:
             if h.infected:
@@ -66,7 +74,11 @@ class Environment(ABC):
 
     @abstractmethod
     def getImmuneCount(self):
-        # Returns the number of immune hosts
+        """
+        Gets the number of immune hosts in the environment
+
+        :return: The number of immune hosts (int)
+        """
         count = 0
         for h in self.hosts:
             if h.immune:

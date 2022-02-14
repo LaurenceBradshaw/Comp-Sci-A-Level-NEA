@@ -45,8 +45,8 @@ class Building(environment.Environment):
         """
         Simulates a day progressing on the building
 
-        :param disease: The disease the simulation is running
-        :param day: The day that is currently being run
+        :param disease: The disease the simulation is running (disease)
+        :param day: The day that is currently being run (string)
         """
         # If the building should run given the day
         if day in self.activePeriod:
@@ -94,7 +94,7 @@ class Building(environment.Environment):
         """
         Increment each host
 
-        :param disease: The disease the simulation is running
+        :param disease: The disease the simulation is running (disease)
         """
         for h in self.hosts:
             h.increment(disease)
@@ -103,7 +103,7 @@ class Building(environment.Environment):
         """
         Decrement each host
 
-        :param disease: The disease the simulation is running
+        :param disease: The disease the simulation is running (disease)
         """
         for h in self.hosts:
             h.decrement(disease)
@@ -119,10 +119,10 @@ class City(container.Container):
         """
         Constructor for the city class
 
-        :param name: Name of the city
-        :param long: Longitude of the city
-        :param lat: Latitude of the city
-        :param commutePercentage: Percentage of the population that will travel to a different city
+        :param name: Name of the city (string)
+        :param long: Longitude of the city (float)
+        :param lat: Latitude of the city (float)
+        :param commutePercentage: Percentage of the population that will travel to a different city (int)
         """
         super().__init__(name)
         self.longitude = long
@@ -137,7 +137,7 @@ class City(container.Container):
         Sets up the city
         Makes host and building objects and then run the populate function on them
 
-        :param db: The database handler class for accessing the database
+        :param db: The database handler class for accessing the database (databaseHandler)
         """
         print("Making host objects for {}...".format(self.name))
         # Makes all the hosts that the city will contain
@@ -228,7 +228,7 @@ class City(container.Container):
         """
         Runs increment method on each host
 
-        :param disease: The disease that the simulation is running
+        :param disease: The disease that the simulation is running (disease)
         """
         for h in self.hosts:
             h.increment(disease)
@@ -237,7 +237,7 @@ class City(container.Container):
         """
         Runs decrement method on each host
 
-        :param disease: The disease that the simulation is running
+        :param disease: The disease that the simulation is running (disease)
         """
         for h in self.hosts:
             h.decrement(disease)
@@ -245,8 +245,8 @@ class City(container.Container):
     def getCommuters(self, percentage):
         """
         Gets the host objects that will travel out of the city for that time step
-        :param percentage: The percentage of hosts to take
-        :return: The host objects that will travel out of the city
+        :param percentage: The percentage of hosts to take (float)
+        :return: The host objects that will travel out of the city (list)
         """
         toReturn = []
         numToReturn = round(len(self.commutePopulation)*percentage)
@@ -258,8 +258,8 @@ class City(container.Container):
         """
         Simulates a day progressing in the city
 
-        :param disease: The disease the simulation is running
-        :param day: The name of the day that is being simulated
+        :param disease: The disease the simulation is running (disease)
+        :param day: The name of the day that is being simulated (string)
         """
         # Make a copy of the host objects
         hostObjects = self.hosts.copy()
@@ -293,7 +293,7 @@ class Country(container.Container):
         """
         Constructor for the country
 
-        :param name: the name of the country (is left blank because its not used anywhere and doesn't need one)
+        :param name: the name of the country (is left blank because its not used anywhere and doesn't need one) (string)
         """
         super().__init__(name)
         self.percentageMatrix = []
@@ -303,7 +303,7 @@ class Country(container.Container):
         """
         Sets up the country
 
-        :param db: The database handler class for accessing the database
+        :param db: The database handler class for accessing the database (databaseHandler)
         """
         # Get the information about the cities contained in the country
         cityDetails = db.getCities()
@@ -326,7 +326,7 @@ class Country(container.Container):
         # Matrix that stores the distances between the cities
         matrix = [[0.0 for x in range(len(cityDetails))] for y in range(len(cityDetails))]
         # the percentage (in decimal) that the number of people going to that city will be out of all the selected people to travel between cities
-        self.percentageMatrix = [[0.0 for x in range(len(cityDetails))] for y in range(len(cityDetails))]
+        self.percentageMatrix = matrix.copy()
         for counter1, city1 in enumerate(cityDetails):
             for counter2, city2 in enumerate(cityDetails):
                 if city1[0] != city2[0]:
@@ -362,8 +362,8 @@ class Country(container.Container):
     def timeStep(self, disease, day):
         """
         Simulates a day progressing in the country
-        :param disease: The disease the simulation is running
-        :param day: The current day that is being run
+        :param disease: The disease the simulation is running (disease)
+        :param day: The current day that is being run (string)
         """
         for o in self.objects:
             o.timeStep(disease, day)
@@ -399,7 +399,7 @@ class Country(container.Container):
         """
         Calls the increment method on each city
 
-        :param disease: The disease the simulation is running
+        :param disease: The disease the simulation is running (disease)
         """
         super().increment(disease)
 
@@ -407,6 +407,6 @@ class Country(container.Container):
         """
         Calls the decrement method on each city
 
-        :param disease: The disease the simulation is running
+        :param disease: The disease the simulation is running (disease)
         """
         super().decrement(disease)

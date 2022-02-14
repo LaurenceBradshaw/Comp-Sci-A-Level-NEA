@@ -11,10 +11,10 @@ class Model(object):
         Constructor for the model class
         makes and sets all the necessary details for the model to run
 
-        :param disease: The disease class that the model will run for
-        :param runtime: The amount of time for the model to run for
-        :param startDate: The date at which the model will start at
-        :param db: The class which handles all actions with the database
+        :param disease: The disease class that the model will run for (disease)
+        :param runtime: The amount of time for the model to run for (int)
+        :param startDate: The date at which the model will start at (list) [day, month, year]
+        :param db: The class which handles all actions with the database (databaseHandler)
         """
         self.startDate = date(startDate[2], startDate[1], startDate[0])
         self.disease = disease
@@ -26,9 +26,9 @@ class Model(object):
         """
         Simulates a day in the model
 
-        :param topLevel: The container that contains all other containers
-        :param res: The date
-        :param i: The amount of time that the simulation has run for
+        :param topLevel: The container that contains all other containers (container)
+        :param res: The date (string)
+        :param i: The amount of time that the simulation has run for (int)
         """
         # Converts the date into a day of the week
         dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']

@@ -12,7 +12,7 @@ class Plotter(plotter.Plotter):
         """
         Constructor for the plotter
 
-        :param db: The class which handles all interactions with the database
+        :param db: The class which handles all interactions with the database (databaseHandler)
         """
         super(Plotter, self).__init__()
         self.db = db
@@ -41,8 +41,8 @@ class Plotter(plotter.Plotter):
         """
         Updates the pandas dataframe with the hosts infected and immune for the day that was just simulated
 
-        :param i: The number of days passed since the simulation started
-        :param topLevel: The container that contains all other containers
+        :param i: The number of days passed since the simulation started (int)
+        :param topLevel: The container that contains all other containers (container)
         """
         for num, city in enumerate(topLevel.objects):
             self.output[num] = self.output[num].append({'Day': i, 'Infected': city.getInfectedCount(), 'Immunities': city.getImmuneCount()}, ignore_index=True)

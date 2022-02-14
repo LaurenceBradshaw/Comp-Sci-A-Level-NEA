@@ -1,13 +1,12 @@
 import pyodbc
 import os
+from Framework import databasehandler
 
 
-# TODO: make abstract
-class DatabaseHandler(object):
+class DatabaseHandler(databasehandler.DatabaseHandler):
     """
     Class for handling all input from and output to the database
     """
-
     def __init__(self, config):
         """
         Constructor of the DatabaseHandler class
@@ -15,8 +14,9 @@ class DatabaseHandler(object):
         Connection to and cursor for the database are made
         Runs the getIteration function to find the number of the simulation
 
-        :param config: the config number of the simulation that is being run
+        :param config: the config number of the simulation that is being run (int)
         """
+        super(DatabaseHandler, self).__init__()
         # Database file path and connection string
         filename = os.path.join(os.path.expanduser("~"), "Documents/databaseRevised.accdb")
         conn_str = (r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
@@ -34,10 +34,10 @@ class DatabaseHandler(object):
         """
         Adds a record to the Output table in the database with the param data
 
-        :param cityName: Name of the city this output record is for
-        :param time: Time elapsed in the simulation
-        :param infectedCount: The number of infected hosts at time param
-        :param immuneCount: The number of immune hosts at time param
+        :param cityName: Name of the city this output record is for (string)
+        :param time: Time elapsed in the simulation (int)
+        :param infectedCount: The number of infected hosts at time param (int)
+        :param immuneCount: The number of immune hosts at time param (int)
         """
         self.cursor.execute('insert into Output (Iteration, SimulationConfiguration, CityID, TimeElapsed, InfectedHosts, ImmuneHosts)'
                             'values ({},{},\'{}\',{},{},{})'.format(self.iteration, self.configuration, cityName, time, infectedCount, immuneCount))
@@ -49,7 +49,7 @@ class DatabaseHandler(object):
         Finds the largest number and then adds one for the current simulation
         Iteration is the number of that run for the configuration
 
-        :return: Largest iteration number + 1
+        :return: Largest iteration number + 1 (int)
         """
         self.cursor.execute('select Iteration from Output where TimeElapsed = 1 and SimulationConfiguration = {}'.format(self.configuration))
         largest = 0
@@ -67,7 +67,7 @@ class DatabaseHandler(object):
         CityID is the name of the city
         CommutePercentage is the percentage of the population from the city that will travel to different cities each day
 
-        :return: CityID, Longitude, Latitude, CommutePercentage for all cities as pyodbc row
+        :return: CityID, Longitude, Latitude, CommutePercentage for all cities (pyodbc row)
         """
         self.cursor.execute('select City.CityID, Longitude, Latitude, CommutePercentage '
                             'from SimulationCities inner join City '
@@ -79,8 +79,8 @@ class DatabaseHandler(object):
         """
         Gets the number of hosts that the specified city will contain
 
-        :param cityName: The name of the city of which to fetch the data for
-        :return: the number of hosts in the specified city as an int
+        :param cityName: The name of the city of which to fetch the data for (string)
+        :return: the number of hosts in the specified city (int)
         """
         self.cursor.execute('select HostCount from City where CityID = \'{}\''.format(cityName))
         return self.cursor.fetchall()[0]
@@ -90,8 +90,8 @@ class DatabaseHandler(object):
         Gets the environments, the number of them, and the population average and bounds,
         days where the environment is active and the interactionRate for the specified city
 
-        :param cityName: The name of the city of which to fetch the data for
-        :return: EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate as a pyodbc row
+        :param cityName: The name of the city of which to fetch the data for (string)
+        :return: EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate (pyodbc row)
         """
         self.cursor.execute('select CityEnvironments.EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate '
                             'from CityEnvironments inner join Environments on CityEnvironments.EnvironmentType = Environments.EnvironmentType '
@@ -102,8 +102,8 @@ class DatabaseHandler(object):
         """
         Gets the percentage of the population of a city that will travel between cities
 
-        :param cityName: The name of the city of which to fetch the data for
-        :return: the percentage as a pyodbc row
+        :param cityName: The name of the city of which to fetch the data for (string)
+        :return: The percentage (pyodbc row)
         """
         self.cursor.execute('select CommutePercentage from City where CityID = \'{}\''.format(cityName))
         return self.cursor.fetchall()
@@ -112,8 +112,7 @@ class DatabaseHandler(object):
         """
         Gets the information about the disease from the disease table
 
-        :param disease: The name of the disease of which to fetch the data for
-        :return:
+        :return: Duration, LatencyPeriod, InfectionChance, ImmuneDuration of the disease (pyodbc row)
         """
         self.cursor.execute('select Disease from Simulation where SimulationConfiguration = {}'.format(self.configuration))
         disease = self.cursor.fetchall()[0][0]
@@ -124,7 +123,7 @@ class DatabaseHandler(object):
         """
         Gets the runtime that the SimulationConfiguration has specified for this simulation
 
-        :return: the simulations runtime as an int
+        :return: the simulations runtime (int)
         """
         self.cursor.execute('select RunTime from Simulation where SimulationConfiguration = {}'.format(self.configuration))
         return self.cursor.fetchall()[0]
@@ -133,7 +132,7 @@ class DatabaseHandler(object):
         """
         Gets the start date that the SimulationConfiguration has specified for this simulation
 
-        :return: the start date as a list [day, month, year]
+        :return: the start date (list) [day, month, year]
         """
         self.cursor.execute('select StartDate from Simulation where SimulationConfiguration = {}'.format(self.configuration))
         date = self.cursor.fetchall()[0][0]

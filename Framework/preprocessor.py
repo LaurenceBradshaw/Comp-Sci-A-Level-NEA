@@ -17,8 +17,20 @@ class Preprocessing(ABC):
 
     @abstractmethod
     def preprocess(self, disease):
+        """
+        Sets up the environments and hosts for the simulation
+
+        :param disease: The disease class that the model will run for (disease)
+        :return: One container type object to the model (container)
+        """
         pass
 
     @abstractmethod
-    def initialInfection(self, disease, hosts):
+    def initialInfection(self, disease, topLevel):
+        """
+        Decides the initial infection
+
+        :param disease: The disease class that the model will run for (disease)
+        :param topLevel: The container that contains all other containers (container)
+        """
         pass

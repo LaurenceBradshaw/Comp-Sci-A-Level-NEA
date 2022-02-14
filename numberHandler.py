@@ -27,7 +27,7 @@ def weightedRandom(lb, ub, avg):
 
 
 def coordsToDistance(lon1, lon2, lat1, lat2):
-    # R = 3959.87433  # this is in miles.  For Earth radius in kilometers use 6372.8 km
+    # R = 3959.87433 for distance in miles.  For Earth radius in kilometers use 6372.8 km
     R = 6372.8
     dLat = math.radians(lat2 - lat1)
     dLon = math.radians(lon2 - lon1)

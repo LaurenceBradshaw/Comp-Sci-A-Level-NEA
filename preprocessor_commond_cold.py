@@ -12,7 +12,7 @@ class Preprocessing(preprocessor.Preprocessing):
         """
         Constructor for the preprocessor
 
-        :param db: The class which handles all actions with the database
+        :param db: The class which handles all actions with the database (databaseHandler)
         """
         super(Preprocessing, self).__init__()
         self.db = db
@@ -21,8 +21,8 @@ class Preprocessing(preprocessor.Preprocessing):
         """
         Runs the preprocessing process
 
-        :param disease: The disease that the simulation with model
-        :return: One container type object to the model
+        :param disease: The disease that the simulation with model (disease)
+        :return: One container type object to the model (container)
         """
         topLevel = place.Country("")
         topLevel.populate(self.db)
@@ -31,7 +31,14 @@ class Preprocessing(preprocessor.Preprocessing):
         return topLevel
 
     def initialInfection(self, disease, topLevel):
+        """
+        Makes the initial infection in the simulation
+
+        :param disease: The disease the simulation is running (disease)
+        :param topLevel: The container that contains all other containers (container)
+        """
         try:
+            # Selects a random city, building and host
             cityNum = random.randint(0, len(topLevel.objects)-1)
             c = topLevel.objects[cityNum]
             buildingNum = random.randint(0, len(c.objects)-1)
@@ -47,4 +54,5 @@ class Preprocessing(preprocessor.Preprocessing):
             print("Building: {}".format(buildingNum))
             print("Host: {}".format(hostNum))
         except ValueError:
+            # Catches an error if the building has no hosts in it
             self.initialInfection(disease, topLevel)

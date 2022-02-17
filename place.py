@@ -3,6 +3,7 @@ import numberHandler
 import person
 from Framework import environment, container
 import time
+import unittest
 
 
 class Building(environment.Environment):
@@ -325,36 +326,7 @@ class Country(container.Container):
         print("Finished All Cities")
         print("Making City Matrix...")
 
-        # Matrix that stores the distances between the cities
-        matrix = [[0.0 for x in range(len(cityDetails))] for y in range(len(cityDetails))]
-        # the percentage (in decimal) that the number of people going to that city will be out of all the selected people to travel between cities
-        self.percentageMatrix = matrix.copy()
-        for counter1, city1 in enumerate(cityDetails):
-            for counter2, city2 in enumerate(cityDetails):
-                if city1[0] != city2[0]:
-                    distance = numberHandler.coordsToDistance(city1[1], city2[1], city1[2], city2[2])
-                    # inverts the distance as number of people traveling will be inversely proportional to the distance
-                    # removes distances longer than 250km to simulate a typical journey length
-                    if distance < 250:
-                        matrix[counter1][counter2] = 1 / distance
-                    else:
-                        matrix[counter1][counter2] = 0.0
-
-        # Turns the distance into a percentage from each city
-        for rowNum, row in enumerate(matrix):
-            # Finds the total amount of distance that each row has
-            rowDistance = 0
-            for item in row:
-                rowDistance += item
-            # Turns each distance into a percentage
-            for itemNum, item in enumerate(row):
-                self.percentageMatrix[rowNum][itemNum] = item/rowDistance
-
-        for row in matrix:
-            print(row)
-
-        for row in self.percentageMatrix:
-            print(row)
+        self.percentageMatrix = makeMatrix(cityDetails)
 
         print("Made City Matrix")
 
@@ -412,3 +384,38 @@ class Country(container.Container):
         :param disease: The disease the simulation is running (disease)
         """
         super().decrement(disease)
+
+
+def makeMatrix(cityDetails):
+    # Matrix that stores the distances between the cities
+    matrix = [[0.0 for x in range(len(cityDetails))] for y in range(len(cityDetails))]
+    # the percentage (in decimal) that the number of people going to that city will be out of all the selected people to travel between cities
+    percentageMatrix = matrix.copy()
+    for counter1, city1 in enumerate(cityDetails):
+        for counter2, city2 in enumerate(cityDetails):
+            if city1[0] != city2[0]:
+                distance = numberHandler.coordsToDistance(city1[1], city2[1], city1[2], city2[2])
+                # inverts the distance as number of people traveling will be inversely proportional to the distance
+                # removes distances longer than 250km to simulate a typical journey length
+                if distance < 250:
+                    matrix[counter1][counter2] = 1 / distance
+                else:
+                    matrix[counter1][counter2] = 0.0
+
+    # Turns the distance into a percentage from each city
+    for rowNum, row in enumerate(matrix):
+        # Finds the total amount of distance that each row has
+        rowDistance = 0
+        for item in row:
+            rowDistance += item
+        if rowDistance == 0:
+            raise ZeroDivisionError('At least one city is too far from any other city to send hosts between')
+        # Turns each distance into a percentage
+        for itemNum, item in enumerate(row):
+            percentageMatrix[rowNum][itemNum] = item / rowDistance
+
+    return percentageMatrix
+
+
+
+

@@ -30,6 +30,7 @@ class Model(object):
         :param res: The date (string)
         :param i: The amount of time that the simulation has run for (int)
         """
+        startTime = time.time()
         # Converts the date into a day of the week
         dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         day = datetime.strptime(res, '%d-%m-%Y').weekday()
@@ -56,12 +57,13 @@ class Model(object):
             rNaught = 0.0
 
         print("{} - {} ({})/({}) = ({})".format(i, dayName[day], infected, prevInfected, rNaught))
+        print("Day {}: %s seconds".format(i) % (time.time() - startTime))
 
     def run(self):
         """
         Starts the model
         """
-        starTime = time.time()
+        startTime = time.time()
         # Makes a new instance of preprocessing
         p = preprocessing.Preprocessing(self.db)
         # Preprocessing returns one container
@@ -82,4 +84,4 @@ class Model(object):
         # Makes the plotter makes the plots
         self.plotter.makePlot()
         print("Model Finished")
-        print("%s seconds" % (time.time() - starTime))
+        print("%s seconds" % (time.time() - startTime))

@@ -261,6 +261,7 @@ class City(container.Container):
         :param disease: The disease the simulation is running (disease)
         :param day: The name of the day that is being simulated (string)
         """
+        timeStart = time.time()
         # Make a copy of the host objects
         hostObjects = self.hosts.copy()
         # Iterates through each building in the city
@@ -280,6 +281,7 @@ class City(container.Container):
         # Runs the increment and decrement methods on all the buildings in the city
         self.increment(disease)
         self.decrement(disease)
+        print(self.name+": %s seconds" % (time.time() - timeStart))
 
 
 class Country(container.Container):

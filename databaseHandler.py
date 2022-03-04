@@ -96,7 +96,7 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         :return: the number of hosts in the specified city (int)
         """
         self.cursor.execute('select HostCount from City where CityID = \'{}\''.format(cityName))
-        return self.cursor.fetchall()[0]
+        return self.cursor.fetchall()[0][0]
 
     def getEnvironments(self, cityName):
         """

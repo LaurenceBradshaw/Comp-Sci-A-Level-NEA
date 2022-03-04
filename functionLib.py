@@ -88,3 +88,21 @@ def makeCity(ID, lon, lat, commutePercentage):
     return place.City(ID, lon, lat, commutePercentage)
 
 
+def sortHosts(hosts):
+    peopleByAgeDict = {
+        "House": hosts,
+        "Office": [],
+        "School": [],
+    }
+
+    # Sorts the hosts out by age
+    for h in hosts:
+        # If a child
+        if h.age <= 18:
+            peopleByAgeDict["School"].append(h)
+        # If not a child and of working age
+        elif 18 < h.age <= 65:
+            peopleByAgeDict["Office"].append(h)
+
+    return peopleByAgeDict
+

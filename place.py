@@ -141,7 +141,7 @@ class City(container.Container):
         """
         print("Making host objects for {}...".format(self.name))
         # Makes all the hosts that the city will contain
-        hostCount = db.getHostCount(self.name)[0]
+        hostCount = db.getHostCount(self.name)
         for x in range(hostCount):
             self.hosts.append(person.Person())
 
@@ -151,21 +151,8 @@ class City(container.Container):
         # Makes a copy of the hosts list
         hostObjects = self.hosts.copy()
 
-        # Dictionary to store hosts once they have been sorted out by age
-        peopleByAgeDict = {
-            "House": hostObjects,
-            "Office": [],
-            "School": [],
-        }
-
-        # Sorts the hosts out by age
-        for h in self.hosts:
-            # If a child
-            if h.age <= 18:
-                peopleByAgeDict["School"].append(h)
-            # If not a child and of working age
-            elif 18 < h.age <= 65:
-                peopleByAgeDict["Office"].append(h)
+        # Dictionary to store hosts sorted by age groups
+        peopleByAgeDict = functionLib.sortHosts(self.hosts)
 
         print("Sorted host objects for {}".format(self.name))
         print("Making environments and adding hosts for {}...".format(self.name))

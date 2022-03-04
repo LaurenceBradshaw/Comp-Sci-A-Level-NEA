@@ -9,7 +9,7 @@ class TestPopulate(unittest.TestCase):
         self.country = place.Country("Country")
 
     @patch("databaseHandler.DatabaseHandler")
-    @patch("place.makeMatrix")
+    @patch("functionLib.makeMatrix")
     def testItGivesTheExpectedResults(self, mockMakeMatrix, mockDb):
         mockMakeMatrix.return_value = [[]]
         mockDb.getCities.return_value = {

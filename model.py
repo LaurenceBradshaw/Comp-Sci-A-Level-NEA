@@ -83,5 +83,6 @@ class Model(object):
 
         # Makes the plotter makes the plots
         self.plotter.makePlot()
+        # TODO: Run the mapping script
         print("Model Finished")
         print("%s seconds" % (time.time() - startTime))

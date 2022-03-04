@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import MagicMock, patch, Mock
 import functionLib
 import place
+from person import Person
 
 
 class TestMakeMatrix(unittest.TestCase):
@@ -115,3 +116,20 @@ class TestHalfwayHouseMatrix(unittest.TestCase):
         }
         halfwayHouses = functionLib.makeHalfwayHouses(cityDetails)
         self.assertIsInstance(halfwayHouses[0][0], place.Building)
+
+
+class TestSortHosts(unittest.TestCase):
+
+    def testItShouldSortTheHostsCorrectly(self):
+        hosts = [Person(), Person(), Person(), Person(), Person(), Person()]
+        hosts[0].age = 4  # school
+        hosts[1].age = 18  # school
+        hosts[2].age = 20  # office
+        hosts[3].age = 65  # office
+        hosts[4].age = 70  # none
+        hosts[5].age = 9999999999999999999  # none
+        result = functionLib.sortHosts(hosts)
+        self.assertEqual(len(result["House"]), 6)
+        self.assertEqual(len(result["Office"]), 2)
+        self.assertEqual(len(result["School"]), 2)
+

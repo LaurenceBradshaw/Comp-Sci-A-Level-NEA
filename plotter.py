@@ -25,17 +25,29 @@ class Plotter(plotter.Plotter):
         """
         Outputs the final plot for each city once the simulation has finished running
         """
-        for num, city in enumerate(self.cities):
+        for i in range(len(self.cities['CityID'])):
             ax = plt.gca()
 
-            self.output[num].plot(kind='line', x='Day', y='Infected', ax=ax, color='red')
-            self.output[num].plot(kind='line', x='Day', y='Immunities', ax=ax, color='k')
+            self.output[i].plot(kind='line', x='Day', y='Infected', ax=ax, color='red')
+            self.output[i].plot(kind='line', x='Day', y='Immunities', ax=ax, color='k')
             plt.xticks(rotation=20)
 
-            filename = os.path.join(os.getcwd(), "Output/{}Output.png".format(city[0]))
+            filename = os.path.join(os.getcwd(), "Output/{}Output.png".format(self.cities['CityID'][i]))
             plt.savefig(filename)
             plt.close()
-            print("Plot made for {}".format(city[0]))
+            print("Plot made for {}".format(self.cities['CityID'][i]))
+
+        # for num, city in enumerate(self.cities):
+        #     ax = plt.gca()
+        #
+        #     self.output[num].plot(kind='line', x='Day', y='Infected', ax=ax, color='red')
+        #     self.output[num].plot(kind='line', x='Day', y='Immunities', ax=ax, color='k')
+        #     plt.xticks(rotation=20)
+        #
+        #     filename = os.path.join(os.getcwd(), "Output/{}Output.png".format(city[0]))
+        #     plt.savefig(filename)
+        #     plt.close()
+        #     print("Plot made for {}".format(city[0]))
 
     def updateOutput(self, i, topLevel):
         """

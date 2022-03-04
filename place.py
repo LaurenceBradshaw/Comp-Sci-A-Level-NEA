@@ -1,9 +1,8 @@
 import random
-import numberHandler
+import functionLib
 import person
 from Framework import environment, container
 import time
-import unittest
 
 
 class Building(environment.Environment):
@@ -60,7 +59,7 @@ class Building(environment.Environment):
                 # Foreach infected host
                 for _ in infectedHosts:
                     # Calculate their interactions with the other hosts in the building
-                    interactions = min(round(numberHandler.generatePoisson(self.interactionRate)), len(uninfectedHosts))
+                    interactions = min(round(functionLib.generatePoisson(self.interactionRate)), len(uninfectedHosts))
                     # Foreach uninfected host that the infected host has come into contact with
                     for uip in random.sample(uninfectedHosts, interactions):
                         # See if they get infected
@@ -180,7 +179,7 @@ class City(container.Container):
                 # For the number of requested environments of that type
                 for _ in range(e[1]):
                     # Get the number of people to add to that environment
-                    hostCount = numberHandler.weightedRandom(e[2], e[3], e[4])
+                    hostCount = functionLib.weightedRandom(e[2], e[3], e[4])
                     hostsToGo = []
                     # Tries to take the required number of hosts
                     try:
@@ -270,7 +269,7 @@ class City(container.Container):
             # If the building is a shop (getting the shops population for the day)
             if o.name == "Shop":
                 # Find how many hosts will visit this shop
-                numToTake = numberHandler.weightedRandom(self.shopRange[0], self.shopRange[1], self.shopRange[2])
+                numToTake = functionLib.weightedRandom(self.shopRange[0], self.shopRange[1], self.shopRange[2])
                 o.hosts = []
                 # Randomly take these hosts from the copied host list and append them to the shop
                 for _ in range(numToTake):
@@ -313,9 +312,11 @@ class Country(container.Container):
 
         print("Retrieved City Information")
 
+        for i in range(len(cityDetails['CityID'])):
+            self.objects.append(functionLib.makeCity(cityDetails['CityID'][i], cityDetails['Longitude'][i], cityDetails['Latitude'][0], cityDetails['CommutePercentage'][0]))
         # Makes the cities
-        for cityStuff in cityDetails:
-            self.objects.append(City(cityStuff[0], cityStuff[1], cityStuff[2], cityStuff[3]))
+        # for cityStuff in cityDetails:
+        #    self.objects.append(makeCity(cityStuff))
 
         # Populate the cities
         startTime = time.time()
@@ -326,12 +327,12 @@ class Country(container.Container):
         print("Finished All Cities")
         print("Making City Matrix...")
 
-        self.percentageMatrix = makeMatrix(cityDetails)
+        self.percentageMatrix = functionLib.makeMatrix(cityDetails)
 
         print("Made City Matrix")
 
         # Make halfway houses between cities
-        self.halfwayHouses = [[Building("Everyday", "HalfwayHouse", 0.1, []) for x in range(len(cityDetails))] for y in range(len(cityDetails))]
+        self.halfwayHouses = functionLib.makeHalfwayHouses(cityDetails)
 
     def timeStep(self, disease, day):
         """
@@ -344,6 +345,7 @@ class Country(container.Container):
 
         # Populates the halfway houses
         # Halfway houses are used to simulate hosts going between cities and interacting with each other
+        # Only does half the matrix
         for row in range(len(self.halfwayHouses[0])-1):
             for col in range(row+1, len(self.halfwayHouses[0])):
                 self.halfwayHouses[row][col].hosts += self.objects[row].getCommuters(self.percentageMatrix[row][col])
@@ -384,38 +386,6 @@ class Country(container.Container):
         :param disease: The disease the simulation is running (disease)
         """
         super().decrement(disease)
-
-
-def makeMatrix(cityDetails):
-    # Matrix that stores the distances between the cities
-    matrix = [[0.0 for x in range(len(cityDetails))] for y in range(len(cityDetails))]
-    # the percentage (in decimal) that the number of people going to that city will be out of all the selected people to travel between cities
-    percentageMatrix = matrix.copy()
-    for counter1, city1 in enumerate(cityDetails):
-        for counter2, city2 in enumerate(cityDetails):
-            if city1[0] != city2[0]:
-                distance = numberHandler.coordsToDistance(city1[1], city2[1], city1[2], city2[2])
-                # inverts the distance as number of people traveling will be inversely proportional to the distance
-                # removes distances longer than 250km to simulate a typical journey length
-                if distance < 250:
-                    matrix[counter1][counter2] = 1 / distance
-                else:
-                    matrix[counter1][counter2] = 0.0
-
-    # Turns the distance into a percentage from each city
-    for rowNum, row in enumerate(matrix):
-        # Finds the total amount of distance that each row has
-        rowDistance = 0
-        for item in row:
-            rowDistance += item
-        if rowDistance == 0:
-            raise ZeroDivisionError('At least one city is too far from any other city to send hosts between')
-        # Turns each distance into a percentage
-        for itemNum, item in enumerate(row):
-            percentageMatrix[rowNum][itemNum] = item / rowDistance
-
-    return percentageMatrix
-
 
 
 

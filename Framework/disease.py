@@ -12,11 +12,15 @@ class Disease(ABC):
         self._latencyPeriod = 0
         self._infectionChance = 0
         self._duration = 0
-        self._immunityProb = 100
+        self._immuneDuration = 0
 
     ##########
     # Properties
     ##########
+
+    @property
+    def immuneDuration(self):
+        return self._immuneDuration
 
     @property
     def latencyPeriod(self):
@@ -30,13 +34,13 @@ class Disease(ABC):
     def duration(self):
         return self._duration
 
-    @property
-    def immunityProb(self):
-        return self._immunityProb
-
     ##########
     # Property setters
     #########
+
+    @immuneDuration.setter
+    def immuneDuration(self, value):
+        self._immuneDuration = value
 
     @latencyPeriod.setter
     def latencyPeriod(self, value):
@@ -49,7 +53,3 @@ class Disease(ABC):
     @duration.setter
     def duration(self, value):
         self._duration = value
-
-    @immunityProb.setter
-    def immunityProb(self, value):
-        self._immunityProb = value

@@ -73,7 +73,20 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
                             'from SimulationCities inner join City '
                             'on SimulationCities.CityID = City.CityID '
                             'where SimulationConfiguration = {}'.format(self.configuration))
-        return self.cursor.fetchall()
+        cityDict = {
+            'CityID': [],
+            'Longitude': [],
+            'Latitude': [],
+            'CommutePercentage': []
+        }
+        result = self.cursor.fetchall()
+        for row in result:
+            cityDict['CityID'].append(row[0])
+            cityDict['Longitude'].append(row[1])
+            cityDict['Latitude'].append(row[2])
+            cityDict['CommutePercentage'].append(row[3])
+
+        return cityDict
 
     def getHostCount(self, cityName):
         """
@@ -96,6 +109,7 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         self.cursor.execute('select CityEnvironments.EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate '
                             'from CityEnvironments inner join Environments on CityEnvironments.EnvironmentType = Environments.EnvironmentType '
                             'where CityEnvironments.CityID = \'{}\''.format(cityName))
+        # TODO: Make Dict
         return self.cursor.fetchall()
 
     def getCommutePercentage(self, cityName):
@@ -114,9 +128,10 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
 
         :return: Duration, LatencyPeriod, InfectionChance, ImmuneDuration of the disease (pyodbc row)
         """
-        self.cursor.execute('select Disease from Simulation where SimulationConfiguration = {}'.format(self.configuration))
-        disease = self.cursor.fetchall()[0][0]
-        self.cursor.execute('select Duration, LatencyPeriod, InfectionChance, ImmuneDuration from Disease where DiseaseID = \'{}\''.format(disease))
+        self.cursor.execute('select Duration, LatencyPeriod, InfectionChance, ImmuneDuration '
+                            'from Disease inner join Simulation on Disease.DiseaseID = Simulation.Disease '
+                            'where SimulationConfiguration = {}'.format(self.configuration))
+        # TODO: Make Dict and make join statement
         return self.cursor.fetchall()[0]
 
     def getRuntime(self):

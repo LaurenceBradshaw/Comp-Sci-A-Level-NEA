@@ -1,4 +1,4 @@
-import numberHandler
+import functionLib
 from Framework import host
 
 
@@ -10,9 +10,8 @@ class Person(host.Host):
         """
         Constructor for the host class
         """
-        self.age = numberHandler.weightedRandom(1, 100, 35)
+        self.age = functionLib.weightedRandom(1, 100, 35)
         super(Person, self).__init__()
-        self.immuneDuration = 0
 
     def getAge(self):
         """
@@ -37,7 +36,7 @@ class Person(host.Host):
             self.infectious = True
         # Increments the amount of time a person has been immune for
         if self.immune:
-            self.immuneDuration += 1
+            self.immuneTime += 1
 
     def decrement(self, disease):
         """
@@ -53,6 +52,6 @@ class Person(host.Host):
             self.infectedTime = 0
             self.immune = True
         # Removes immune status from people who have been immune for the disease immunity period
-        if self.immuneDuration >= disease.immuneDuration:
+        if self.immuneTime >= disease.immuneDuration:
             self.immune = False
             self.immuneDuration = 0

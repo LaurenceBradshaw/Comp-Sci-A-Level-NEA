@@ -15,10 +15,15 @@ class Host(ABC):
         self._latencyTime = 0
         self._infectedTime = 0
         self._immune = False
+        self._immuneTime = 0
 
     ##########
     # Properties
     ##########
+
+    @property
+    def immuneTime(self):
+        return self._immuneTime
 
     @property
     def infectious(self):
@@ -43,6 +48,10 @@ class Host(ABC):
     ##########
     # Property Setters
     ##########
+
+    @immuneTime.setter
+    def immuneTime(self, value):
+        self._immuneTime = value
 
     @infected.setter
     def infected(self, value):

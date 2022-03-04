@@ -5,7 +5,7 @@ class DatabaseHandler(ABC):
     """
     Abstract class for accessing the database
     """
-    def __init__(self, ):
+    def __init__(self):
         pass
 
     ##########

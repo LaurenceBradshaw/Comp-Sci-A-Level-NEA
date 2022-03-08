@@ -2,28 +2,25 @@ import math
 import random
 from numpy import random as rn
 import place
-
-
-class RateOutOfRange(Exception):
-    pass
+import person
+import validation
 
 
 def generatePoisson(rate):
-    if 0 < rate < 1:
-        res = random.randint(0, 100)/101.0
+    # Checking the rate is within the expected range
+    validation.generatePoissonRange(rate)
 
-        a = -math.log(1.0-res)/(1-rate)
-    else:
-        raise RateOutOfRange('Interaction Rate Is Out Of The Expected Range')
+    res = random.randint(0, 100)/101.0
+    a = -math.log(1.0-res)/(1-rate)
 
     return a
 
 
 def weightedRandom(lb, ub, avg):
+    # Checking the average is within the lower and upper bounds
+    validation.weightedRandomRange(lb, ub, avg)
+
     x = []
-    # Checking if the average is the same as the bounds
-    avg = ub if ub-avg < 0 else avg
-    avg = lb if avg-lb < 0 else avg
     valid = False
     while not valid:
         if avg - lb > ub - avg:
@@ -88,6 +85,10 @@ def makeCity(ID, lon, lat, commutePercentage):
     return place.City(ID, lon, lat, commutePercentage)
 
 
+def makeBuilding(activePeriod, name, interactionRate, hosts):
+    return place.Building(activePeriod, name, interactionRate, hosts)
+
+
 def sortHosts(hosts):
     peopleByAgeDict = {
         "House": hosts,
@@ -106,3 +107,23 @@ def sortHosts(hosts):
 
     return peopleByAgeDict
 
+
+def selectCount(count, items):
+    toGo = []
+    # Tries to take the required number of hosts
+    try:
+        for _ in range(count):
+            toGo.append(items.pop(random.randint(0, len(items)-1)))
+    # If the list is empty it cant take any so it will catch the error
+    except IndexError:
+        toGo += items
+
+    return toGo
+
+
+def makeHosts(count):
+    hosts = []
+    for _ in range(count):
+        hosts.append(person.Person())
+
+    return hosts

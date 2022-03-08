@@ -2,6 +2,7 @@ import preprocessor_commond_cold as preprocessing
 import plotter as pltr
 from datetime import datetime, date, timedelta
 import time
+import validation
 
 
 class Model(object):
@@ -16,6 +17,11 @@ class Model(object):
         :param startDate: The date at which the model will start at (list) [day, month, year]
         :param db: The class which handles all actions with the database (databaseHandler)
         """
+        validation.isInt(runtime)
+        validation.isDatabaseHandler(db)
+        validation.isList(startDate)
+        validation.isDisease(disease)
+
         self.startDate = date(startDate[2], startDate[1], startDate[0])
         self.disease = disease
         self.runtime = runtime

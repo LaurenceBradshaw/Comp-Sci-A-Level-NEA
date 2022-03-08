@@ -1,6 +1,7 @@
 import random
 import functionLib
 import person
+import validation
 from Framework import environment, container
 import time
 
@@ -124,6 +125,14 @@ class City(container.Container):
         :param lat: Latitude of the city (float)
         :param commutePercentage: Percentage of the population that will travel to a different city (int)
         """
+        validation.isFloat(long)
+        validation.isFloat(lat)
+        validation.isString(name)
+        validation.isInt(commutePercentage)
+        validation.coordRange(long)
+        validation.coordRange(lat)
+        validation.percentageRange(commutePercentage)
+
         super().__init__(name)
         self.longitude = long
         self.latitude = lat
@@ -139,11 +148,12 @@ class City(container.Container):
 
         :param db: The database handler class for accessing the database (databaseHandler)
         """
+        validation.isDatabaseHandler(db)
+
         print("Making host objects for {}...".format(self.name))
         # Makes all the hosts that the city will contain
         hostCount = db.getHostCount(self.name)
-        for x in range(hostCount):
-            self.hosts.append(person.Person())
+        self.hosts = functionLib.makeHosts(hostCount)
 
         print("Made host objects for {}".format(self.name))
         print("Sorting host objects for {}...".format(self.name))
@@ -167,16 +177,9 @@ class City(container.Container):
                 for _ in range(e[1]):
                     # Get the number of people to add to that environment
                     hostCount = functionLib.weightedRandom(e[2], e[3], e[4])
-                    hostsToGo = []
-                    # Tries to take the required number of hosts
-                    try:
-                        for _ in range(hostCount):
-                            hostsToGo.append(peopleByAgeDict[e[0]].pop(0))
-                    # If the list is empty it cant take any so it will catch the error
-                    except IndexError:
-                        hostsToGo += hostObjects
+                    hostsToGo = functionLib.selectCount(hostCount, peopleByAgeDict[e[0]])
                     # Makes the environment
-                    self.objects.append(Building(e[5], e[0], e[6], hostsToGo))
+                    self.objects.append(functionLib.makeBuilding(e[5], e[0], e[6], hostsToGo))
             else:
                 # Adds the range of people that will be going to a shop as an attribute
                 self.shopRange += e[2], e[3], e[4]
@@ -235,11 +238,8 @@ class City(container.Container):
         :param percentage: The percentage of hosts to take (float)
         :return: The host objects that will travel out of the city (list)
         """
-        toReturn = []
-        numToReturn = round(len(self.commutePopulation)*percentage)
-        for x in range(numToReturn):
-            toReturn.append(self.commutePopulation.pop(0))
-        return toReturn
+        count = round(len(self.commutePopulation)*percentage)
+        return functionLib.selectCount(count, self.commutePopulation)
 
     def timeStep(self, disease, day):
         """
@@ -259,8 +259,7 @@ class City(container.Container):
                 numToTake = functionLib.weightedRandom(self.shopRange[0], self.shopRange[1], self.shopRange[2])
                 o.hosts = []
                 # Randomly take these hosts from the copied host list and append them to the shop
-                for _ in range(numToTake):
-                    o.hosts.append(hostObjects.pop(random.randint(0, len(hostObjects)-1)))
+                o.hosts = functionLib.selectCount(numToTake, hostObjects)
             # Runs time step on the building
             o.timeStep(disease, day)
         # Updates the commuting population

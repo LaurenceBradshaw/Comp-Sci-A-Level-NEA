@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import MagicMock, patch, Mock
+from unittest.mock import patch
 import functionLib
 import place
+import validation
 from person import Person
 
 
@@ -52,24 +53,39 @@ class TestGeneratePoisson(unittest.TestCase):
         self.assertAlmostEqual(result, 0.9761355487, 10)
 
     @patch('random.randint')
-    def testItShouldRaiseRateOutOfRangeExceptionWhenAboveRange(self, rng):
+    def testItShouldRaiseOutOfRangeExceptionWhenAboveRange(self, rng):
         rng.return_value = 50
-        self.assertRaises(functionLib.RateOutOfRange, functionLib.generatePoisson, 1.1)
+        self.assertRaises(validation.OutOfRange, functionLib.generatePoisson, 1.1)
 
     @patch('random.randint')
-    def testItShouldRaiseRateOutOfRangeExceptionWhenBelowRange(self, rng):
+    def testItShouldRaiseOutOfRangeExceptionWhenBelowRange(self, rng):
         rng.return_value = 50
-        self.assertRaises(functionLib.RateOutOfRange, functionLib.generatePoisson, -0.3)
+        self.assertRaises(validation.OutOfRange, functionLib.generatePoisson, -0.3)
 
     @patch('random.randint')
-    def testItShouldRaiseRateOutOfRangeExceptionWhenLowerBoundOfRange(self, rng):
+    def testItShouldRaiseOutOfRangeExceptionWhenLowerBoundOfRange(self, rng):
         rng.return_value = 50
-        self.assertRaises(functionLib.RateOutOfRange, functionLib.generatePoisson, 0)
+        self.assertRaises(validation.OutOfRange, functionLib.generatePoisson, 0)
 
     @patch('random.randint')
-    def testItShouldRaiseRateOutOfRangeExceptionWhenUpperBoundOfRange(self, rng):
+    def testItShouldRaiseOutOfRangeExceptionWhenUpperBoundOfRange(self, rng):
         rng.return_value = 50
-        self.assertRaises(functionLib.RateOutOfRange, functionLib.generatePoisson, 1)
+        self.assertRaises(validation.OutOfRange, functionLib.generatePoisson, 1)
+
+
+class TestWeightedRandom(unittest.TestCase):
+
+    def testItShouldRaiseOutOfRangeExceptionWhenAverageIsGreaterThanTheUpperBound(self):
+        self.assertRaises(validation.OutOfRange, functionLib.weightedRandom, 1, 3, 4)
+
+    def testItShouldRaiseOutOfRangeExceptionWhenAverageIsLessThanTheLowerBound(self):
+        self.assertRaises(validation.OutOfRange, functionLib.weightedRandom, 3, 6, 2)
+
+    def testItShouldRaiseOutOfRangeExceptionWhenAverageIsEqualToTheUpperBound(self):
+        self.assertRaises(validation.OutOfRange, functionLib.weightedRandom, 1, 3, 3)
+
+    def testItShouldRaiseOutOfRangeExceptionWhenAverageIsEqualToTheLowerBound(self):
+        self.assertRaises(validation.OutOfRange, functionLib.weightedRandom, 3, 6, 3)
 
 
 class TestCoordsToDistance(unittest.TestCase):
@@ -127,9 +143,8 @@ class TestSortHosts(unittest.TestCase):
         hosts[2].age = 20  # office
         hosts[3].age = 65  # office
         hosts[4].age = 70  # none
-        hosts[5].age = 9999999999999999999  # none
+        hosts[5].age = 99  # none
         result = functionLib.sortHosts(hosts)
         self.assertEqual(len(result["House"]), 6)
         self.assertEqual(len(result["Office"]), 2)
         self.assertEqual(len(result["School"]), 2)
-

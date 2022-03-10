@@ -67,19 +67,19 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         CityID is the name of the city
         CommutePercentage is the percentage of the population from the city that will travel to different cities each day
 
-        :return: CityID, Longitude, Latitude, CommutePercentage for all cities (pyodbc row)
+        :return: CityID, Longitude, Latitude, CommutePercentage for all cities (dict)
         """
         self.cursor.execute('select City.CityID, Longitude, Latitude, CommutePercentage '
                             'from SimulationCities inner join City '
                             'on SimulationCities.CityID = City.CityID '
                             'where SimulationConfiguration = {}'.format(self.configuration))
+        result = self.cursor.fetchall()
         cityDict = {
             'CityID': [],
             'Longitude': [],
             'Latitude': [],
             'CommutePercentage': []
         }
-        result = self.cursor.fetchall()
         for row in result:
             cityDict['CityID'].append(row[0])
             cityDict['Longitude'].append(row[1])
@@ -96,7 +96,8 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         :return: the number of hosts in the specified city (int)
         """
         self.cursor.execute('select HostCount from City where CityID = \'{}\''.format(cityName))
-        return self.cursor.fetchall()[0][0]
+        result = self.cursor.fetchall()[0][0]
+        return result
 
     def getEnvironments(self, cityName):
         """
@@ -104,35 +105,49 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         days where the environment is active and the interactionRate for the specified city
 
         :param cityName: The name of the city of which to fetch the data for (string)
-        :return: EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate (pyodbc row)
+        :return: EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate (dict)
         """
         self.cursor.execute('select CityEnvironments.EnvironmentType, Count, LowerBound, UpperBound, Average, ActivePeriod, interactionRate '
                             'from CityEnvironments inner join Environments on CityEnvironments.EnvironmentType = Environments.EnvironmentType '
                             'where CityEnvironments.CityID = \'{}\''.format(cityName))
-        # TODO: Make Dict
-        return self.cursor.fetchall()
+        result = self.cursor.fetchall()
 
-    def getCommutePercentage(self, cityName):
-        """
-        Gets the percentage of the population of a city that will travel between cities
-
-        :param cityName: The name of the city of which to fetch the data for (string)
-        :return: The percentage (pyodbc row)
-        """
-        self.cursor.execute('select CommutePercentage from City where CityID = \'{}\''.format(cityName))
-        return self.cursor.fetchall()
+        dict = {
+            'Type': [],
+            'Count': [],
+            'LowerBound': [],
+            'UpperBound': [],
+            'Average': [],
+            'ActivePeriod': [],
+            'InteractionRate': []
+        }
+        for row in result:
+            dict['Type'].append(row[0])
+            dict['Count'].append(row[1])
+            dict['LowerBound'].append(row[2])
+            dict['UpperBound'].append(row[3])
+            dict['Average'].append(row[4])
+            dict['ActivePeriod'].append(row[5])
+            dict['InteractionRate'].append(row[6])
+        return dict
 
     def getDisease(self):
         """
         Gets the information about the disease from the disease table
 
-        :return: Duration, LatencyPeriod, InfectionChance, ImmuneDuration of the disease (pyodbc row)
+        :return: Duration, LatencyPeriod, InfectionChance, ImmuneDuration of the disease (dict)
         """
         self.cursor.execute('select Duration, LatencyPeriod, InfectionChance, ImmuneDuration '
                             'from Disease inner join Simulation on Disease.DiseaseID = Simulation.Disease '
                             'where SimulationConfiguration = {}'.format(self.configuration))
-        # TODO: Make Dict and make join statement
-        return self.cursor.fetchall()[0]
+        result = self.cursor.fetchall()[0]
+        dict = {
+            'Duration': result[0],
+            'LatencyPeriod': result[1],
+            'InfectionChance': result[2],
+            'ImmuneDuration': result[3]
+        }
+        return dict
 
     def getRuntime(self):
         """
@@ -141,7 +156,8 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         :return: the simulations runtime (int)
         """
         self.cursor.execute('select RunTime from Simulation where SimulationConfiguration = {}'.format(self.configuration))
-        return self.cursor.fetchall()[0]
+        result = self.cursor.fetchall()[0][0]
+        return result
 
     def getStartDate(self):
         """

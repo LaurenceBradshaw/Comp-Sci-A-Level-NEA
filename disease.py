@@ -12,8 +12,8 @@ class Disease(disease.Disease):
         :param diseaseDetails: Info from the database for the disease (pyodbc row)
         """
         super(Disease, self).__init__()
-        self.latencyPeriod = diseaseDetails[1]
-        self.infectionChance = diseaseDetails[2]
-        self.duration = diseaseDetails[0]
-        self.immuneDuration = diseaseDetails[3]
+        self.latencyPeriod = diseaseDetails['LatencyPeriod']
+        self.infectionChance = diseaseDetails['InfectionChance']
+        self.duration = diseaseDetails['Duration']
+        self.immuneDuration = diseaseDetails['ImmuneDuration']
 

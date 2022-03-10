@@ -36,7 +36,6 @@ class Model(object):
         :param res: The date (string)
         :param i: The amount of time that the simulation has run for (int)
         """
-        startTime = time.time()
         # Converts the date into a day of the week
         dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         day = datetime.strptime(res, '%d-%m-%Y').weekday()
@@ -63,7 +62,6 @@ class Model(object):
             rNaught = 0.0
 
         print("{} - {} ({})/({}) = ({})".format(i, dayName[day], infected, prevInfected, rNaught))
-        print("Day {}: %s seconds".format(i) % (time.time() - startTime))
 
     def run(self):
         """
@@ -74,6 +72,7 @@ class Model(object):
         p = preprocessing.Preprocessing(self.db)
         # Preprocessing returns one container
         topLevel = p.preprocess(self.disease)
+        validation.isContainer(topLevel)
         # Starts simulating
         i = 1
         # While the model should still be simulating

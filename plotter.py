@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from Framework import plotter
 import os
+# import mapPlotter
 
 
 class Plotter(plotter.Plotter):
@@ -36,18 +37,6 @@ class Plotter(plotter.Plotter):
             plt.savefig(filename)
             plt.close()
             print("Plot made for {}".format(self.cities['CityID'][i]))
-
-        # for num, city in enumerate(self.cities):
-        #     ax = plt.gca()
-        #
-        #     self.output[num].plot(kind='line', x='Day', y='Infected', ax=ax, color='red')
-        #     self.output[num].plot(kind='line', x='Day', y='Immunities', ax=ax, color='k')
-        #     plt.xticks(rotation=20)
-        #
-        #     filename = os.path.join(os.getcwd(), "Output/{}Output.png".format(city[0]))
-        #     plt.savefig(filename)
-        #     plt.close()
-        #     print("Plot made for {}".format(city[0]))
 
     def updateOutput(self, i, topLevel):
         """

@@ -33,6 +33,11 @@ def weightedRandom(lb, ub, avg):
 
 
 def coordsToDistance(lon1, lon2, lat1, lat2):
+    validation.coordRange(lon1)
+    validation.coordRange(lon2)
+    validation.coordRange(lat1)
+    validation.coordRange(lat2)
+
     # R = 3959.87433 for distance in miles.  For Earth radius in kilometers use 6372.8 km
     R = 6372.8
     dLat = math.radians(lat2 - lat1)
@@ -82,10 +87,22 @@ def makeHalfwayHouses(cityDetails):
 
 
 def makeCity(ID, lon, lat, commutePercentage):
+    validation.isFloat(lon)
+    validation.isFloat(lat)
+    validation.isString(ID)
+    validation.isInt(commutePercentage)
+    validation.percentageRange(commutePercentage)
     return place.City(ID, lon, lat, commutePercentage)
 
 
 def makeBuilding(activePeriod, name, interactionRate, hosts):
+    validation.isList(activePeriod)
+    validation.knownActivePeriod(activePeriod)
+    validation.isString(name)
+    validation.isFloat(interactionRate)
+    validation.isList(hosts)
+    if len(hosts) != 0:
+        validation.isHost(hosts[0])
     return place.Building(activePeriod, name, interactionRate, hosts)
 
 
@@ -115,7 +132,7 @@ def selectCount(count, items):
         for _ in range(count):
             toGo.append(items.pop(random.randint(0, len(items)-1)))
     # If the list is empty it cant take any so it will catch the error
-    except IndexError:
+    except ValueError:
         toGo += items
 
     return toGo

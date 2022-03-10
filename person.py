@@ -54,4 +54,4 @@ class Person(host.Host):
         # Removes immune status from people who have been immune for the disease immunity period
         if self.immuneTime >= disease.immuneDuration:
             self.immune = False
-            self.immuneDuration = 0
+            self.immuneTime = 0

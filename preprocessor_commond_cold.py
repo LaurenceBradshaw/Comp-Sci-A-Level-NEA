@@ -54,5 +54,5 @@ class Preprocessing(preprocessor.Preprocessing):
             print("Building: {}".format(buildingNum))
             print("Host: {}".format(hostNum))
         except ValueError:
-            # Catches an error if the building has no hosts in it
+            # Catches an error if the building has no hosts in it so a random number cannot be generated
             self.initialInfection(disease, topLevel)

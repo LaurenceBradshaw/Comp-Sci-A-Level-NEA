@@ -1,7 +1,5 @@
 import random
 import functionLib
-import person
-import validation
 from Framework import environment, container
 import time
 
@@ -125,14 +123,6 @@ class City(container.Container):
         :param lat: Latitude of the city (float)
         :param commutePercentage: Percentage of the population that will travel to a different city (int)
         """
-        validation.isFloat(long)
-        validation.isFloat(lat)
-        validation.isString(name)
-        validation.isInt(commutePercentage)
-        validation.coordRange(long)
-        validation.coordRange(lat)
-        validation.percentageRange(commutePercentage)
-
         super().__init__(name)
         self.longitude = long
         self.latitude = lat
@@ -148,7 +138,6 @@ class City(container.Container):
 
         :param db: The database handler class for accessing the database (databaseHandler)
         """
-        validation.isDatabaseHandler(db)
 
         print("Making host objects for {}...".format(self.name))
         # Makes all the hosts that the city will contain
@@ -162,7 +151,7 @@ class City(container.Container):
         hostObjects = self.hosts.copy()
 
         # Dictionary to store hosts sorted by age groups
-        peopleByAgeDict = functionLib.sortHosts(self.hosts)
+        peopleByAgeDict = functionLib.sortHosts(hostObjects)
 
         print("Sorted host objects for {}".format(self.name))
         print("Making environments and adding hosts for {}...".format(self.name))
@@ -170,22 +159,22 @@ class City(container.Container):
         # Gets the information about all the environments the city will contain
         environmentInfo = db.getEnvironments(self.name)
 
-        for e in environmentInfo:
+        for e in range(len(environmentInfo['Type'])):
             # If the environment is not a shop (with a dynamic population)
-            if e[0] != "Shop":
+            if environmentInfo['Type'][e] != "Shop":
                 # For the number of requested environments of that type
-                for _ in range(e[1]):
+                for _ in range(environmentInfo['Count'][e]):
                     # Get the number of people to add to that environment
-                    hostCount = functionLib.weightedRandom(e[2], e[3], e[4])
-                    hostsToGo = functionLib.selectCount(hostCount, peopleByAgeDict[e[0]])
+                    hostCount = functionLib.weightedRandom(environmentInfo['LowerBound'][e], environmentInfo['UpperBound'][e], environmentInfo['Average'][e])
+                    hostsToGo = functionLib.selectCount(hostCount, peopleByAgeDict[environmentInfo['Type'][e]])
                     # Makes the environment
-                    self.objects.append(functionLib.makeBuilding(e[5], e[0], e[6], hostsToGo))
+                    self.objects.append(functionLib.makeBuilding(environmentInfo['ActivePeriod'][e], environmentInfo['Type'][e], environmentInfo['InteractionRate'][e], hostsToGo))
             else:
                 # Adds the range of people that will be going to a shop as an attribute
-                self.shopRange += e[2], e[3], e[4]
+                self.shopRange += environmentInfo['LowerBound'][e], environmentInfo['UpperBound'][e], environmentInfo['Average'][e]
                 # Makes the required number of buildings with an empty population
-                for x in range(e[1]):
-                    self.objects.append(Building(e[5], e[0], e[6], []))
+                for x in range(environmentInfo['Count'][e]):
+                    self.objects.append(Building(environmentInfo['ActivePeriod'][e], environmentInfo['Type'][e], environmentInfo['InteractionRate'][e], []))
 
         print("Made environments and added hosts for {}".format(self.name))
         print("Finished {}".format(self.name))
@@ -248,13 +237,12 @@ class City(container.Container):
         :param disease: The disease the simulation is running (disease)
         :param day: The name of the day that is being simulated (string)
         """
-        timeStart = time.time()
         # Make a copy of the host objects
         hostObjects = self.hosts.copy()
         # Iterates through each building in the city
         for o in self.objects:
             # If the building is a shop (getting the shops population for the day)
-            if o.name == "Shop":
+            if o.name == 'Shop':
                 # Find how many hosts will visit this shop
                 numToTake = functionLib.weightedRandom(self.shopRange[0], self.shopRange[1], self.shopRange[2])
                 o.hosts = []
@@ -267,7 +255,6 @@ class City(container.Container):
         # Runs the increment and decrement methods on all the buildings in the city
         self.increment(disease)
         self.decrement(disease)
-        print(self.name+": %s seconds" % (time.time() - timeStart))
 
 
 class Country(container.Container):

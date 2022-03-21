@@ -359,6 +359,3 @@ class Country(container.Container):
         :param disease: The disease the simulation is running (disease)
         """
         super().decrement(disease)
-
-
-

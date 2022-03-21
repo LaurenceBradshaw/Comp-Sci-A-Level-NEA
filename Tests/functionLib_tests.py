@@ -73,21 +73,6 @@ class TestGeneratePoisson(unittest.TestCase):
         self.assertRaises(validation.OutOfRange, functionLib.generatePoisson, 1)
 
 
-class TestWeightedRandom(unittest.TestCase):
-
-    def testItShouldRaiseOutOfRangeExceptionWhenAverageIsGreaterThanTheUpperBound(self):
-        self.assertRaises(validation.OutOfRange, functionLib.weightedRandom, 1, 3, 4)
-
-    def testItShouldRaiseOutOfRangeExceptionWhenAverageIsLessThanTheLowerBound(self):
-        self.assertRaises(validation.OutOfRange, functionLib.weightedRandom, 3, 6, 2)
-
-    def testItShouldRaiseOutOfRangeExceptionWhenAverageIsEqualToTheUpperBound(self):
-        self.assertRaises(validation.OutOfRange, functionLib.weightedRandom, 1, 3, 3)
-
-    def testItShouldRaiseOutOfRangeExceptionWhenAverageIsEqualToTheLowerBound(self):
-        self.assertRaises(validation.OutOfRange, functionLib.weightedRandom, 3, 6, 3)
-
-
 class TestCoordsToDistance(unittest.TestCase):
 
     def testItShouldHaveKnownValue(self):

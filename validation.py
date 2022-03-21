@@ -1,7 +1,5 @@
-import databaseHandler
-import disease
-from Framework import container
-from Framework import host
+from Framework import host, databasehandler, container, disease
+import datetime
 
 
 class OutOfRange(Exception):
@@ -21,7 +19,7 @@ def weightedRandomRange(lb, ub, avg):
 
 
 def coordRange(coord):
-    if not (-180 < coord < 180):
+    if not (-180 <= coord <= 180):
         raise OutOfRange('Coordinate Is Out Of The Expected Range')
 
 
@@ -51,19 +49,47 @@ def isFloat(data):
         raise TypeError('Expected ' + str(float) + ' But Got ' + str(type(data)))
 
 
+def isIntOrFloat(data):
+    if not (isinstance(data, int) or isinstance(data, float)):
+        raise TypeError('Expected ' + str(float) + 'Or ' + str(int) + ' But Got ' + str(type(data)))
+
+
+def isNoneNegativeInt(data):
+    isInt(data)
+    if data < 0:
+        raise ValueError('Expected A Positive Int But Got A Negative One')
+
+
+def isNoneNegativeFloat(data):
+    isFloat(data)
+    if data < 0:
+        raise ValueError('Expected A Positive Float But Got A Negative One')
+
+
+def isNoneNegativeFloatOrInt(data):
+    isIntOrFloat(data)
+    if data < 0:
+        raise ValueError('Expected A Positive Float Or Int But Got A Negative One')
+
+
 def isList(data):
     if not isinstance(data, list):
         raise TypeError('Expected ' + str(list) + ' But Got ' + str(type(data)))
 
 
+def isDate(data):
+    if not isinstance(data, datetime.datetime):
+        raise TypeError('Expected ' + str(datetime.datetime) + ' But Got ' + str(type(data)))
+
+
 def isDatabaseHandler(db):
-    if not isinstance(db, databaseHandler.DatabaseHandler):
-        raise TypeError('Expected ' + str(databaseHandler.DatabaseHandler) + ' But Got ' + str(type(db)))
+    if not issubclass(type(db), databasehandler.DatabaseHandler):
+        raise TypeError('Expected A ' + str(databasehandler.DatabaseHandler) + ' Subclass')
 
 
 def isDisease(d):
-    if not isinstance(d, disease.Disease):
-        raise TypeError('Expected ' + str(disease.Disease) + ' But Got ' + str(type(d)))
+    if not issubclass(type(d), disease.Disease):
+        raise TypeError('Expected A ' + str(disease.Disease) + ' Subclass')
 
 
 def isHost(h):

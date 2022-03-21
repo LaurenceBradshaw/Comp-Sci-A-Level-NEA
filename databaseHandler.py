@@ -1,5 +1,6 @@
 import pyodbc
 import os
+import validation
 from Framework import databasehandler
 
 
@@ -97,6 +98,7 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         """
         self.cursor.execute('select HostCount from City where CityID = \'{}\''.format(cityName))
         result = self.cursor.fetchall()[0][0]
+        validation.isNoneNegativeInt(result)
         return result
 
     def getEnvironments(self, cityName):
@@ -141,6 +143,10 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
                             'from Disease inner join Simulation on Disease.DiseaseID = Simulation.Disease '
                             'where SimulationConfiguration = {}'.format(self.configuration))
         result = self.cursor.fetchall()[0]
+        validation.isNoneNegativeInt(result[0])
+        validation.isNoneNegativeInt(result[1])
+        validation.isNoneNegativeFloat(result[2])
+        validation.isNoneNegativeInt(result[3])
         dict = {
             'Duration': result[0],
             'LatencyPeriod': result[1],
@@ -157,6 +163,7 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         """
         self.cursor.execute('select RunTime from Simulation where SimulationConfiguration = {}'.format(self.configuration))
         result = self.cursor.fetchall()[0][0]
+        validation.isNoneNegativeInt(result)
         return result
 
     def getStartDate(self):
@@ -167,4 +174,5 @@ class DatabaseHandler(databasehandler.DatabaseHandler):
         """
         self.cursor.execute('select StartDate from Simulation where SimulationConfiguration = {}'.format(self.configuration))
         date = self.cursor.fetchall()[0][0]
+        validation.isDate(date)
         return [date.day, date.month, date.year]

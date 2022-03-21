@@ -90,16 +90,16 @@ def makeCity(ID, lon, lat, commutePercentage):
     validation.isFloat(lon)
     validation.isFloat(lat)
     validation.isString(ID)
-    validation.isInt(commutePercentage)
+    validation.isNoneNegativeInt(commutePercentage)
     validation.percentageRange(commutePercentage)
     return place.City(ID, lon, lat, commutePercentage)
 
 
 def makeBuilding(activePeriod, name, interactionRate, hosts):
-    validation.isList(activePeriod)
+    validation.isString(activePeriod)
     validation.knownActivePeriod(activePeriod)
     validation.isString(name)
-    validation.isFloat(interactionRate)
+    validation.isNoneNegativeFloat(interactionRate)
     validation.isList(hosts)
     if len(hosts) != 0:
         validation.isHost(hosts[0])
@@ -131,7 +131,7 @@ def selectCount(count, items):
     try:
         for _ in range(count):
             toGo.append(items.pop(random.randint(0, len(items)-1)))
-    # If the list is empty it cant take any so it will catch the error
+    # If the list is empty it cant generate a random number so it will catch the error
     except ValueError:
         toGo += items
 

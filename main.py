@@ -1,12 +1,12 @@
 import disease
 import model
-import databaseHandler
+import databasehandler_country_level_implementation
 
 if __name__ == '__main__':
     configurationNumber = 3
 
     # Makes a connection to the database
-    dbHandler = databaseHandler.DatabaseHandler(configurationNumber)
+    dbHandler = databasehandler_country_level_implementation.DatabaseHandler(configurationNumber)
     # Gets the starting date for the simulation
     startDate = dbHandler.getStartDate()
     # Gets the amount of time that the simulation will run for

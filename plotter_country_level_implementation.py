@@ -2,7 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from Framework import plotter
 import os
-# import mapPlotter
 
 
 class Plotter(plotter.Plotter):

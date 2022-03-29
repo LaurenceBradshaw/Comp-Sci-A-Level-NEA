@@ -1,8 +1,9 @@
-import preprocessor_commond_cold as preprocessing
-import plotter as pltr
+import preprocessor_country_level_implementation as preprocessing
+import plotter_country_level_implementation as pltr
 from datetime import datetime, date, timedelta
 import time
 import validation
+# To import custom parts replace the name after import with the custom part e.g. import preprocessor_common_cold as preprocessing for a script that preprocesses for the common cold
 
 
 class Model(object):
@@ -27,6 +28,7 @@ class Model(object):
         self.runtime = runtime
         self.plotter = pltr.Plotter(db)
         self.db = db
+        self.rNaughtList = []
 
     def timeStep(self, topLevel, res, i):
         """
@@ -61,6 +63,7 @@ class Model(object):
         except ZeroDivisionError:
             rNaught = 0.0
 
+        self.rNaughtList.append(rNaught)
         print("{} - {} ({})/({}) = ({})".format(i, dayName[day], infected, prevInfected, rNaught))
 
     def run(self):
@@ -86,8 +89,13 @@ class Model(object):
             self.plotter.updateOutput(res, topLevel)
             i += 1
 
+        totalRNaught = 0
+        for r in self.rNaughtList:
+            totalRNaught += r
+        print("Average R0 For This Simulation:", (totalRNaught/self.runtime))
+
         # Makes the plotter makes the plots
         self.plotter.makePlot()
-        # TODO: Run the mapping script
+        # Would run the map plotting script here
         print("Model Finished")
         print("%s seconds" % (time.time() - startTime))

@@ -291,7 +291,7 @@ class Country(container.Container):
         # for cityStuff in cityDetails:
         #    self.objects.append(makeCity(cityStuff))
 
-        # Populate the cities
+        # Populate the cities (Could be parallel to decrease the time taken to run)
         startTime = time.time()
         for city in self.objects:
             city.populate(db)
@@ -313,6 +313,7 @@ class Country(container.Container):
         :param disease: The disease the simulation is running (disease)
         :param day: The current day that is being run (string)
         """
+        # Could be parallel to decrease the time taken to run
         for o in self.objects:
             o.timeStep(disease, day)
 
@@ -324,7 +325,7 @@ class Country(container.Container):
                 self.halfwayHouses[row][col].hosts += self.objects[row].getCommuters(self.percentageMatrix[row][col])
                 self.halfwayHouses[row][col].hosts += self.objects[col].getCommuters(self.percentageMatrix[col][row])
 
-        # Progresses time on each halfway house
+        # Progresses time on each halfway house (Could be parallel to decrease the time taken to run)
         for row in self.halfwayHouses:
             for h in row:
                 h.timeStep(disease, day)

@@ -11,7 +11,7 @@ class Model(object):
     def __init__(self, disease, runtime, startDate, db):
         """
         Constructor for the model class
-        makes and sets all the necessary details for the model to run
+        makes and sets all the necessary details. for the model to run
 
         :param disease: The disease class that the model will run for (disease)
         :param runtime: The amount of time for the model to run for (int)

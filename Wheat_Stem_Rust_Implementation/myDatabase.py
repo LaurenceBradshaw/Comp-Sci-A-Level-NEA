@@ -1,7 +1,7 @@
-from Framework import databasehandler
+from Framework import validation
+from Framework.Abstract_Classes import databasehandler
 import pyodbc
 import os
-import validation
 
 
 class myDatabase(databasehandler.DatabaseHandler):

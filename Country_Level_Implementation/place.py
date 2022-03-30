@@ -1,6 +1,6 @@
 import random
 import functionLib
-from Framework import environment, container
+from Framework.Abstract_Classes import container, environment
 import time
 
 
@@ -168,7 +168,8 @@ class City(container.Container):
                     hostCount = functionLib.weightedRandom(environmentInfo['LowerBound'][e], environmentInfo['UpperBound'][e], environmentInfo['Average'][e])
                     hostsToGo = functionLib.selectCount(hostCount, peopleByAgeDict[environmentInfo['Type'][e]])
                     # Makes the environment
-                    self.objects.append(functionLib.makeBuilding(environmentInfo['ActivePeriod'][e], environmentInfo['Type'][e], environmentInfo['InteractionRate'][e], hostsToGo))
+                    self.objects.append(
+                        functionLib.makeBuilding(environmentInfo['ActivePeriod'][e], environmentInfo['Type'][e], environmentInfo['InteractionRate'][e], hostsToGo))
             else:
                 # Adds the range of people that will be going to a shop as an attribute
                 self.shopRange += environmentInfo['LowerBound'][e], environmentInfo['UpperBound'][e], environmentInfo['Average'][e]
@@ -286,7 +287,8 @@ class Country(container.Container):
         print("Retrieved City Information")
 
         for i in range(len(cityDetails['CityID'])):
-            self.objects.append(functionLib.makeCity(cityDetails['CityID'][i], cityDetails['Longitude'][i], cityDetails['Latitude'][0], cityDetails['CommutePercentage'][0]))
+            self.objects.append(
+                functionLib.makeCity(cityDetails['CityID'][i], cityDetails['Longitude'][i], cityDetails['Latitude'][0], cityDetails['CommutePercentage'][0]))
         # Makes the cities
         # for cityStuff in cityDetails:
         #    self.objects.append(makeCity(cityStuff))

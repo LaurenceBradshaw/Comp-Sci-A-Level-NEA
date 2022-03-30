@@ -1,4 +1,4 @@
-from Framework import disease
+from Framework.Abstract_Classes import disease
 
 
 class Disease(disease.Disease):

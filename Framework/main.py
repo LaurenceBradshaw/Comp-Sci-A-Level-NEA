@@ -1,6 +1,6 @@
-import disease
+from Framework.Abstract_Classes import disease
 import model
-import databasehandler_country_level_implementation as db
+from Country_Level_Implementation import databasehandler_country_level_implementation as db
 
 if __name__ == '__main__':
     configurationNumber = 1

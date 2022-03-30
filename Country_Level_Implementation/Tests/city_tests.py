@@ -1,7 +1,6 @@
 import unittest
-from unittest.mock import MagicMock, patch, Mock
-import functionLib
-import place
+from unittest.mock import patch
+from Country_Level_Implementation import place, functionLib
 
 
 class TestConstructor(unittest.TestCase):

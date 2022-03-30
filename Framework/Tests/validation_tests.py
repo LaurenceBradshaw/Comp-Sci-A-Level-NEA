@@ -1,8 +1,8 @@
 import unittest
 from ddt import data, ddt
-import validation
 import datetime
-from Framework import databasehandler, disease, host, container
+from Framework import validation
+from Framework.Abstract_Classes import databasehandler, host, container, disease
 
 
 class TestValidationGeneratePoissonRange(unittest.TestCase):

@@ -1,5 +1,4 @@
-import math
-from Framework import preprocessor
+from Framework.Abstract_Classes import preprocessor
 import place
 import random
 

@@ -3,7 +3,7 @@ import random
 from numpy import random as rn
 import place
 import person
-import validation
+from Framework import validation
 
 
 def generatePoisson(rate):

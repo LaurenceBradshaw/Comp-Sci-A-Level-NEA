@@ -1,4 +1,4 @@
-from Framework import host, databasehandler, container, disease
+from Framework.Abstract_Classes import databasehandler, host, container, disease
 import datetime
 
 

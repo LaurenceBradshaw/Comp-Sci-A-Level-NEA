@@ -4,11 +4,11 @@ import pyodbc
 import os
 
 
-class myDatabase(databasehandler.DatabaseHandler):
+class DatabaseHandler(databasehandler.DatabaseHandler):
 
     def __init__(self, config):
         super().__init__()
-        filename = os.path.join(os.path.expanduser("~"), "Documents/wheatrustdb.accdb")
+        filename = os.path.join(os.path.expanduser("~"), "Documents/Wheat Rust/wheatrustdb.accdb")
         conn_str = (r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
                     r'DBQ=' + filename + ';')
         # Makes a connection to the database
@@ -25,7 +25,7 @@ class myDatabase(databasehandler.DatabaseHandler):
         return date
 
     def getDisease(self):
-        pass
+        return ""
 
     def getRuntime(self):
         self.cursor.execute('select Runtime from Simulation where ID = {}'.format(self.configuration))
@@ -40,6 +40,15 @@ class myDatabase(databasehandler.DatabaseHandler):
                             'where SimulationFields.ID = {}'.format(self.configuration))
         result = self.cursor.fetchall()
         return result
+
+    def getStartingSources(self):
+        self.cursor.execute('select Field from SimulationFields where StartingSource = true and SimulationFields.ID = {}'.format(self.configuration))
+        result = self.cursor.fetchall()
+        return result
+
+    def getSimulationParameters(self):
+        self.cursor.execute('select MaxDeposition, ProbabilityThreshold, Species, Timestep from Simulation where Simulation.ID = {}'.format(self.configuration))
+        return self.cursor.fetchall()[0]
 
     def writeOutput(self, fieldName, time, infected):
         pass

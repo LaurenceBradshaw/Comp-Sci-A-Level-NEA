@@ -1,6 +1,6 @@
-from Framework.Abstract_Classes import disease
+from Wheat_Stem_Rust_Implementation import stemrust as disease
 import model
-from Country_Level_Implementation import databasehandler_country_level_implementation as db
+from Wheat_Stem_Rust_Implementation import myDatabase as db
 
 if __name__ == '__main__':
     configurationNumber = 1

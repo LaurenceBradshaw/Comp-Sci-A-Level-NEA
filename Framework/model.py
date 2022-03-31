@@ -1,5 +1,5 @@
-from Country_Level_Implementation import preprocessor_country_level_implementation as preprocessing, \
-    plotter_country_level_implementation as pltr
+from Wheat_Stem_Rust_Implementation import preprocessing as preprocessing, \
+    plotter as pltr
 from datetime import datetime, date, timedelta
 import time
 import validation
@@ -20,25 +20,26 @@ class Model(object):
         """
         validation.isInt(runtime)
         validation.isDatabaseHandler(db)
-        validation.isList(startDate)
+        validation.isDate(startDate)
         validation.isDisease(disease)
 
-        self.startDate = date(startDate[2], startDate[1], startDate[0])
+        self.startDate = startDate
         self.disease = disease
         self.runtime = runtime
         self.plotter = pltr.Plotter(db)
         self.db = db
         self.rNaughtList = []
 
-    def timeStep(self, topLevel, res, i):
+    def timeStep(self, topLevel, resDate, i):
         """
         Simulates a day in the model
 
+        :param resDate: The date
         :param topLevel: The container that contains all other containers (container)
-        :param res: The date (string)
         :param i: The amount of time that the simulation has run for (int)
         """
         # Converts the date into a day of the week
+        res = resDate.strftime("%d-%m-%Y")
         dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         day = datetime.strptime(res, '%d-%m-%Y').weekday()
         # Counts the number of hosts infected before the day is simulated
@@ -46,7 +47,7 @@ class Model(object):
         prevInfected = 0
         prevInfected += topLevel.getInfectedCount()
         # Simulates the day
-        topLevel.timeStep(self.disease, dayName[day])
+        topLevel.timeStep(self.disease, resDate)
         # Counts the number of infections after the day has been simulated
         infected += topLevel.getInfectedCount()
 
@@ -84,7 +85,7 @@ class Model(object):
             resDate = self.startDate + timedelta(days=i - 1)
             res = resDate.strftime("%d-%m-%Y")
             # Tells the top level container to simulate a day
-            self.timeStep(topLevel, res, i)
+            self.timeStep(topLevel, resDate, i)
             # Updates the output for plotting at the end of the models runtime
             self.plotter.updateOutput(res, topLevel)
             i += 1

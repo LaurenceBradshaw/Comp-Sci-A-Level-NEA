@@ -18,6 +18,9 @@ class Region(container.Container):
         for o in self.objects:
             o.timeStep(disease, date, uninfectedHosts, self.maxDeposition, self.species, self.timestepScale, self.probabilityThreshold)
 
+    def calculateDeposition(self):
+        pass
+
     def getUninfectedHosts(self):
         """
         Gets the objects of the hosts which are uninfected
@@ -31,10 +34,18 @@ class Region(container.Container):
         return uninfectedHosts
 
     def getInfectedCount(self):
-        pass
+        count = 0
+        for o in self.objects:
+            count += o.getInfectedCount()
+
+        return count
 
     def getImmuneCount(self):
-        pass
+        count = 0
+        for o in self.objects:
+            count += o.getImmuneCount()
+
+        return count
 
     def increment(self, disease):
         pass
@@ -49,7 +60,7 @@ class Region(container.Container):
         for row in startingSources:
             startingSourceList.append(row[0])
         for row in fieldData:
-            f = field.Field(row[0], row[5], 0, row[4], row[1], row[2], row[3], row[6])
+            f = field.Field(row[0], row[1], 0, row[2], row[3], row[4], row[5], row[6])
             f.addHost()
             if f.name in startingSourceList:
                 f.infect()

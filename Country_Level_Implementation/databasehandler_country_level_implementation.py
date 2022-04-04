@@ -7,6 +7,7 @@ from Framework.Abstract_Classes import databasehandler
 class DatabaseHandler(databasehandler.DatabaseHandler):
     """
     Class for handling all input from and output to the database
+    Since there is no user input to the program, other than what is in the database, there is no need to guard against sql injection
     """
     def __init__(self, config):
         """

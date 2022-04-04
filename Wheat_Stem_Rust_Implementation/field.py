@@ -7,14 +7,16 @@ from Wheat_Stem_Rust_Implementation import wheat
 class Field(environment.Environment):
 
     def __init__(self, name, activePeriod, interactionRate, waterType, country, lat, lon, infectiousPeriod):
-        activePeriod = [int(x) for x in activePeriod.split()]
+        activePeriod = [int(x) for x in activePeriod.split(',')]
         super().__init__(name, activePeriod, interactionRate)
         self.waterType = waterType
         self.name = name
         self.country = country
         self.latitude = lat
         self.longitude = lon
-        self.infectiousPeriod = [int(x) for x in infectiousPeriod.split()]
+        self.infectiousPeriod = [int(x) for x in infectiousPeriod.split(',')]
+        self.deposition = 0
+        self.suitability = 0
 
     def timeStep(self, disease, date, uninfectedHosts, maxDeposition, species, timestepScale, probabilityThreshold):
         if date.month in self.infectiousPeriod:
@@ -22,26 +24,33 @@ class Field(environment.Environment):
             infectedHosts = self.getInfectedHosts()
             # If there are infected hosts in the environment
             if len(infectedHosts) != 0:
-                # Foreach infected host
+                # if the field is infectious
                 if self.infectious():
                     for uninfectedHost in uninfectedHosts:
                         df = self._load_source_receptor_file('{}_{}'.format(self.country, self.name),
                                                              '{}_{}'.format(uninfectedHost.country, uninfectedHost.name),
                                                              species, timestepScale, self.waterType)
-                        df = df[(df['Year'] == date.year) & (df['Month'] == date.month) & (
-                                    df['Day'] == date.day) & (df['Hour'] == date.hour)]
+                        df['Hour'] = [x.split(' ')[-1].split(':')[0] for x in df['Timestamp'].values]
+                        df['Year'] = [x.split(' ')[0].split('-')[0] for x in df['Timestamp'].values]
+                        df['Month'] = [x.split(' ')[0].split('-')[1] for x in df['Timestamp'].values]
+                        df['Day'] = [x.split(' ')[0].split('-')[2] for x in df['Timestamp'].values]
+                        df = df.sort_values(by=['Year', 'Month', 'Day', 'Hour'])
+                        df = df[(df['Year'].astype('int') == date.year) & (df['Month'].astype('int') == date.month) & (
+                                    df['Day'].astype('int') == date.day)]
                         print(date)
                         if date.month in uninfectedHost.activePeriod:
                             print('source={}'.format(self.name))
                             print('receptor={}'.format(uninfectedHost.name))
                             print('df suitability={}'.format(df.Suitability.values[0]))
                             print('df deposition={}'.format(df.Deposition.values[0]))
-                            disease.calc_relative_probability_norm(df.Suitability.values[0], df.Deposition.values[0])
+                            uninfectedHost.deposition += df.Deposition.values[0]
+                            uninfectedHost.suitability = df.Suitability.values[0]
+                            disease.calc_relative_probability_norm(df.Deposition.values[0], df.Suitability.values[0])
+                            if disease.infectionChance > 0:
+                                uninfectedHost.infect()
 
-        self.increment(date)
-        self.decrement(date)
-
-
+        self.increment(disease, date)
+        self.decrement(disease, date)
 
     # def load_data(self, source, timestep, species):
     #     '''
@@ -150,10 +159,10 @@ class Field(environment.Environment):
         return filename
 
     def getInfectedCount(self):
-        pass
+        return 1 if self.hosts[0].infected else 0
 
     def getImmuneCount(self):
-        pass
+        return 1 if self.hosts[0].immune else 0
 
     def getInfectiousHosts(self):
         infectedHosts = []
@@ -176,7 +185,6 @@ class Field(environment.Environment):
 
     def infect(self):
         for host in self.hosts:
-            host.infectious = True
             host.infected = True
 
     def addHost(self):
@@ -194,11 +202,17 @@ class Field(environment.Environment):
         else:
             return False
 
+    def immune(self):
+        if self.hosts[0].immune:
+            return True
+        else:
+            return False
+
     def latencyTime(self):
         return self.hosts[0].latencyTime
 
-    def increment(self, date):
-        self.hosts[0].increment(date, self.activePeriod)
+    def increment(self, disease, date):
+        self.hosts[0].increment(disease, date, self.activePeriod, self.infectiousPeriod)
 
-    def decrement(self, date):
-        self.hosts[0].decrement(date, self.infectiousPeriod)
+    def decrement(self, disease, date):
+        self.hosts[0].decrement(disease, date, self.activePeriod, self.infectiousPeriod)

@@ -35,6 +35,3 @@ class Wheat(host.Host):
             self.latencyTime = 0
             self.infectious = False
             self.infected = False
-
-
-

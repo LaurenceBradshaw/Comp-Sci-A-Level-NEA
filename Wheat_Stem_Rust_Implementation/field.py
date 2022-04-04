@@ -18,7 +18,16 @@ class Field(environment.Environment):
         self.deposition = 0
         self.suitability = 0
 
-    def timeStep(self, disease, date, uninfectedHosts, maxDeposition, species, timestepScale, probabilityThreshold):
+    def timeStep(self, disease, date):
+
+        disease.calc_relative_probability_norm(self.deposition, self.suitability)
+        if disease.infectionChance > 0:
+            self.infect()
+
+        self.increment(disease, date)
+        self.decrement(disease, date)
+
+    def calculateDeposition(self, date, uninfectedHosts, species, timestepScale):
         if date.month in self.infectiousPeriod:
             # Gets the infected host objects
             infectedHosts = self.getInfectedHosts()
@@ -36,7 +45,7 @@ class Field(environment.Environment):
                         df['Day'] = [x.split(' ')[0].split('-')[2] for x in df['Timestamp'].values]
                         df = df.sort_values(by=['Year', 'Month', 'Day', 'Hour'])
                         df = df[(df['Year'].astype('int') == date.year) & (df['Month'].astype('int') == date.month) & (
-                                    df['Day'].astype('int') == date.day)]
+                                df['Day'].astype('int') == date.day)]
                         print(date)
                         if date.month in uninfectedHost.activePeriod:
                             print('source={}'.format(self.name))
@@ -45,12 +54,6 @@ class Field(environment.Environment):
                             print('df deposition={}'.format(df.Deposition.values[0]))
                             uninfectedHost.deposition += df.Deposition.values[0]
                             uninfectedHost.suitability = df.Suitability.values[0]
-                            disease.calc_relative_probability_norm(df.Deposition.values[0], df.Suitability.values[0])
-                            if disease.infectionChance > 0:
-                                uninfectedHost.infect()
-
-        self.increment(disease, date)
-        self.decrement(disease, date)
 
     # def load_data(self, source, timestep, species):
     #     '''

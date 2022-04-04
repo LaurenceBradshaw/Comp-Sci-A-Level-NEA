@@ -6,20 +6,20 @@ class Region(container.Container):
 
     def __init__(self, name):
         super().__init__(name)
-        self.maxDeposition = 0
         self.species = ""
         self.timestepScale = ""
-        self.probabilityThreshold = 0
 
     def timeStep(self, disease, date):
-
         # Gets the uninfected host objects
         uninfectedHosts = self.getUninfectedHosts()
-        for o in self.objects:
-            o.timeStep(disease, date, uninfectedHosts, self.maxDeposition, self.species, self.timestepScale, self.probabilityThreshold)
+        self.calculateDeposition(date, uninfectedHosts)
 
-    def calculateDeposition(self):
-        pass
+        for o in self.objects:
+            o.timeStep(disease, date)
+
+    def calculateDeposition(self, date, uninfectedHosts):
+        for o in self.objects:
+            o.calculateDeposition(date, uninfectedHosts, self.species, self.timestepScale)
 
     def getUninfectedHosts(self):
         """

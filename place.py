@@ -288,8 +288,6 @@ class Country(container.Container):
         for i in range(len(cityDetails['CityID'])):
             self.objects.append(functionLib.makeCity(cityDetails['CityID'][i], cityDetails['Longitude'][i], cityDetails['Latitude'][0], cityDetails['CommutePercentage'][0]))
         # Makes the cities
-        # for cityStuff in cityDetails:
-        #    self.objects.append(makeCity(cityStuff))
 
         # Populate the cities (Could be parallel to decrease the time taken to run)
         startTime = time.time()
@@ -314,8 +312,7 @@ class Country(container.Container):
         :param day: The current day that is being run (string)
         """
         # Could be parallel to decrease the time taken to run
-        for o in self.objects:
-            o.timeStep(disease, day)
+        super().timeStep(disease, day)
 
         # Populates the halfway houses
         # Halfway houses are used to simulate hosts going between cities and interacting with each other

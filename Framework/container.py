@@ -52,6 +52,7 @@ class Container(ABC):
     def timeStep(self, disease, day):
         """
         Simulates a day on each object in the container
+        This could be made a parallel process in a linux system.
 
         :param disease: The disease that is running in the simulation
         :param day: That name of the day that is being run

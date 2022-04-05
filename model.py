@@ -1,5 +1,3 @@
-import preprocessor_country_level_implementation as preprocessing
-import plotter_country_level_implementation as pltr
 from datetime import datetime, date, timedelta
 import time
 import validation
@@ -8,7 +6,7 @@ import validation
 
 class Model(object):
 
-    def __init__(self, disease, runtime, startDate, db):
+    def __init__(self, disease, runtime, startDate, db, pltr, preprocess):
         """
         Constructor for the model class
         makes and sets all the necessary details for the model to run
@@ -26,7 +24,8 @@ class Model(object):
         self.startDate = date(startDate[2], startDate[1], startDate[0])
         self.disease = disease
         self.runtime = runtime
-        self.plotter = pltr.Plotter(db)
+        self.plotter = pltr
+        self.preprocessor = preprocess
         self.db = db
         self.rNaughtList = []
 
@@ -72,7 +71,7 @@ class Model(object):
         """
         startTime = time.time()
         # Makes a new instance of preprocessing
-        p = preprocessing.Preprocessing(self.db)
+        p = self.preprocessor.Preprocessing(self.db)
         # Preprocessing returns one container
         topLevel = p.preprocess(self.disease)
         validation.isContainer(topLevel)
